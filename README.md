@@ -115,21 +115,6 @@ def load_myembedder() -> ImageEmbedder:
 
 You can then retrieve a factory via `get_embedder_factory("myembedder")` like the built-in models.
 
-## Included VPR models
-
-Below is a brief description of each wrapped model and how it is loaded.
-
-
-| Key | Wrapper class | Backbone / descriptor info | Loading method |
-| :-- | :-- | :-- | :-- |
-| `salad` | `SALADWrapper` | DINOv2 backbone, custom SALAD aggregator.[^2] | `torch.hub.load("serizba/salad", "dinov2_salad")`.[^2] |
-| `mixvpr` | `MixVPRWrapper` | ResNet backbone, MixVPR aggregator, 512-D descriptors.[^3] | Custom implementation, weights from URL in `MIXVPRURL`.[^3] |
-| `netvlad` | `NetVLAD` | VGG16 backbone, NetVLAD aggregation, 4k or 32k dims.[^4] | Weights loaded from official MATLAB `.mat` files via `wget` and `scipy.io`.[^4] |
-| `eigenplaces` | `EigenPlacesWrapper` | ResNet50 backbone, 2048-D descriptors.[^5] | `torch.hub.load("gmberton/eigenplaces", "get_trained_model", ...)`.[^5] |
-| `megaloc` | `MegaLocWrapper` | DINOv2 backbone, feature dim from `impl.feat_dim`.[^6] | `torch.hub.load("gmberton/MegaLoc", "get_trained_model", ...)` (CUDA-only).[^6] |
-| `cosplace` | `CosPlaceWrapper` | ResNet50 backbone, 2048-D descriptors.[^7] | `torch.hub.load("gmberton/cosplace", "get_trained_model", ...)`.[^7] |
-| `cliquemining` | `CliqueMiningWrapper` | DINOv2 backbone, SALAD-style aggregator.[^8] | SALAD from `torch.hub`, CliqueMining weights from `CLIQUEMINING_CHECKPOINT_URL` (CUDA-only).[^2][^8] |
-| `anyloc` | `AnyLocWrapper` | DINOv2 backbone, VLAD aggregation.[^9] | `torch.hub.load("AnyLocDINO", "get_vlad_model", ...)` (CUDA-only).[^9] |
 
 ## Testing
 
@@ -147,11 +132,11 @@ uv run pytest
 This package reuses ideas, code, and checkpoints from several excellent VPR projects.
 Please cite and credit the original works when using the corresponding models.
 
-- SALAD: original repository at `https://github.com/serizba/salad`.
-- MixVPR: paper “Feature Mixing for Visual Place Recognition”, and reference implementation at `https://github.com/amaralibey/MixVPR` (parts of which this code is based on).
-- NetVLAD: paper “NetVLAD: CNN architecture for weakly supervised place recognition”, and code from `https://github.com/cvg/Hierarchical-Localization`.
-- EigenPlaces: loaded from the `gmberton/eigenplaces` Torch Hub repository.
-- MegaLoc: loaded from the `gmberton/MegaLoc` Torch Hub repository.
-- CosPlace: loaded from the `gmberton/cosplace` Torch Hub repository.
-- CliqueMining: original repository at `https://github.com/serizba/clique-mining/tree/main` and checkpoint hosted under your `vpr-model-zoo` release URL.
-- AnyLoc: loaded from the `AnyLocDINO` Torch Hub entry, which wraps the AnyLoc model.
+- (AnyLoc)[https://github.com/AnyLoc/DINO]
+- (CliqueMining)[https://github.com/serizba/clique-mining]
+- (CosPlace)[https://github.com/gmberton/CosPlace]
+- (EigenPlaces)[https://github.com/gmberton/EigenPlaces]
+- (MegaLoc)[https://github.com/gmberton/MegaLoc]
+- (MixVPR)[https://github.com/amaralibey/MixVPR]
+- (NetVLAD)[https://github.com/cvg/Hierarchical-Localization]
+- (SALAD)[https://github.com/serizba/salad]
