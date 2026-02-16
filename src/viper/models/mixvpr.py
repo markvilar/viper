@@ -16,7 +16,7 @@ from viper.types import ImageEmbedder
 from .helpers import convert_grayscale_batch_to_rgb
 
 
-MIXVPR_URL: str = "https://github.com/markvilar/vpr-model-zoo/releases/download/v0.0.1/resnet50_MixVPR_512_channels.256._rows.2.ckpt"
+MIXVPR_URL: str = "https://github.com/markvilar/viper/releases/download/v0.0.1/resnet50_MixVPR_512_channels.256._rows.2.ckpt"
 DESCRIPTOR_SIZE: int = 512
 
 
