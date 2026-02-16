@@ -132,11 +132,11 @@ uv run pytest
 This package reuses ideas, code, and checkpoints from several excellent VPR projects.
 Please cite and credit the original works when using the corresponding models.
 
-- (AnyLoc)[https://github.com/AnyLoc/DINO]
-- (CliqueMining)[https://github.com/serizba/clique-mining]
-- (CosPlace)[https://github.com/gmberton/CosPlace]
-- (EigenPlaces)[https://github.com/gmberton/EigenPlaces]
-- (MegaLoc)[https://github.com/gmberton/MegaLoc]
-- (MixVPR)[https://github.com/amaralibey/MixVPR]
-- (NetVLAD)[https://github.com/cvg/Hierarchical-Localization]
-- (SALAD)[https://github.com/serizba/salad]
+- [AnyLoc](https://github.com/AnyLoc/DINO)
+- [CliqueMining](https://github.com/serizba/clique-mining)
+- [CosPlace](https://github.com/gmberton/CosPlace)
+- [EigenPlaces](https://github.com/gmberton/EigenPlaces)
+- [MegaLoc](https://github.com/gmberton/MegaLoc)
+- [MixVPR](https://github.com/amaralibey/MixVPR)
+- [NetVLAD](https://github.com/cvg/Hierarchical-Localization)
+- [SALAD](https://github.com/serizba/salad)
