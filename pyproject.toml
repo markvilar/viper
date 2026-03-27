@@ -1,6 +1,6 @@
 [project]
 name = "viper"
-version = "0.1.0"
+version = "0.2.0"
 description = "A package for visual place recognition (VPR) models."
 readme = "README.md"
 authors = [
@@ -22,6 +22,7 @@ dependencies = [
   "xformers>=0.0.30", # NOTE: required by megaloc
   "pytorch-lightning>=2.6.0", # NOTE: required by cliquemining
   "fast-pytorch-kmeans>=0.2.2", # NOTE: required by anyloc
+  "pytorch-metric-learning>=2.9.0", # NOTE: required by cliquemining and salad
 ]
 
 [project.scripts]
