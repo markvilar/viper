@@ -341,6 +341,53 @@ wheels = [
 ]
 
 [[package]]
+name = "libviper"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "einops" },
+    { name = "fast-pytorch-kmeans" },
+    { name = "imageio" },
+    { name = "loguru" },
+    { name = "msgspec" },
+    { name = "pytest" },
+    { name = "python-dotenv" },
+    { name = "pytorch-lightning" },
+    { name = "ruff" },
+    { name = "scipy" },
+    { name = "torch" },
+    { name = "torchvision" },
+    { name = "tqdm" },
+    { name = "xformers" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "einops", specifier = ">=0.8.1" },
+    { name = "fast-pytorch-kmeans", specifier = ">=0.2.2" },
+    { name = "imageio", specifier = ">=2.37.0" },
+    { name = "loguru", specifier = ">=0.7.3" },
+    { name = "msgspec", specifier = ">=0.19.0" },
+    { name = "pytest", specifier = ">=8.3.4" },
+    { name = "python-dotenv", specifier = ">=1.0.1" },
+    { name = "pytorch-lightning", specifier = ">=2.6.0" },
+    { name = "ruff", specifier = ">=0.8.3" },
+    { name = "scipy", specifier = ">=1.16.0" },
+    { name = "torch", specifier = ">=2.7.0" },
+    { name = "torchvision", specifier = ">=0.24.0" },
+    { name = "tqdm", specifier = ">=4.67.1" },
+    { name = "xformers", specifier = ">=0.0.30" },
+]
+
+[package.metadata.requires-dev]
+dev = [{ name = "ruff", specifier = ">=0.8.3" }]
+
+[[package]]
 name = "lightning-utilities"
 version = "0.15.2"
 source = { registry = "https://pypi.org/simple" }

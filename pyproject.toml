@@ -1,5 +1,5 @@
 [project]
-name = "viper"
+name = "libviper"
 version = "0.2.0"
 description = "A package for visual place recognition (VPR) models."
 readme = "README.md"
