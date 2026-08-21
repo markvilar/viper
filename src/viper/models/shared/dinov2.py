@@ -159,6 +159,9 @@ class DINOv2(nn.Module):
             embed_dim=embed_dim,
         )
         self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim))
+        # Masked-image-modeling token from DINOv2 pretraining; carried so trained
+        # checkpoints load strictly, but unused during inference feature extraction.
+        self.mask_token = nn.Parameter(torch.zeros(1, embed_dim))
         num_patches = (image_size // patch_size) ** 2
         self.pos_embed = nn.Parameter(torch.zeros(1, num_patches + 1, embed_dim))
 
