@@ -12,7 +12,10 @@ lives here.
 from viper.model_decomposition import truncate_linear
 from viper.models.megaloc import MegaLocAggregationModule, MegaLocModel
 
+from .registry import register_forge
 
+
+@register_forge(model_key="megaloc", method="svd", label="svd-truncated")
 def forge_megaloc_svd_truncated(model: MegaLocModel, k: int) -> MegaLocModel:
     """
     Build a new MegaLoc model whose descriptor dimension is reduced to ``k`` via
