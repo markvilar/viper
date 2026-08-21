@@ -16,7 +16,7 @@ def cli() -> None:
     """viper — tools for visual place recognition models."""
 
 
-cli.add_command(forge_group)
+cli.add_command(forge_group, name="forge")
 
 
 def main() -> None:
