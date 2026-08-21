@@ -92,7 +92,7 @@ class CliqueMiningWrapper(torch.nn.Module):
         return self.impl.forward(images_resized)
 
 
-@register_embedder_factory(key="cliquemining")
+@register_embedder_factory(key="cliquemining", family="cliquemining")
 def load_clique_mining() -> ImageEmbedder:
     """
     Loads a CliqueMining wrapper by downloading SALAD from torch hub.

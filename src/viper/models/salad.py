@@ -87,7 +87,7 @@ class SALADWrapper(torch.nn.Module):
         return self.impl.forward(images_resized)
 
 
-@register_embedder_factory(key="salad")
+@register_embedder_factory(key="salad", family="salad")
 def load_salad() -> ImageEmbedder:
     """Loads a SALAD image embedder model."""
     impl: torch.nn.Module = torch.hub.load("serizba/salad", "dinov2_salad")

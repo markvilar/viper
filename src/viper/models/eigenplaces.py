@@ -68,7 +68,7 @@ class EigenPlacesWrapper(torch.nn.Module):
         return self.impl.forward(images)
 
 
-@register_embedder_factory(key="eigenplaces")
+@register_embedder_factory(key="eigenplaces", family="eigenplaces")
 def load_eigenplaces() -> ImageEmbedder:
     """Loads an EigenPlaces model."""
     impl: torch.nn.Module = torch.hub.load(
