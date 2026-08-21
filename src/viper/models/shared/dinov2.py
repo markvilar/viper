@@ -202,7 +202,11 @@ class DINOv2(nn.Module):
             mode="bicubic",
             antialias=self.interpolate_antialias,
         )
-        assert (w0, h0) == patch_pe.shape[-2:]
+        if (w0, h0) != patch_pe.shape[-2:]:
+            raise RuntimeError(
+                f"interpolated positional grid {tuple(patch_pe.shape[-2:])} "
+                f"does not match expected {(w0, h0)}"
+            )
         patch_pe = patch_pe.permute(0, 2, 3, 1).view(1, -1, dim)
         return torch.cat((cls_pe.unsqueeze(0), patch_pe), dim=1).to(previous_dtype)
 
