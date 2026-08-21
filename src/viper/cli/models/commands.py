@@ -1,5 +1,5 @@
 """
-Root-level model-listing CLI commands.
+The ``models`` CLI subgroup: listing registered embedders and their families.
 
 Commands here own only the CLI surface; the work is delegated to
 ``viper.cli.models.actions``.
@@ -12,14 +12,19 @@ from viper.cli.console import console
 from .actions import list_model_families, list_model_keys
 
 
-@click.command(name="list-models")
+@click.group(name="models")
+def models_group() -> None:
+    """Inspect the registered embedder models."""
+
+
+@models_group.command(name="list")
 def list_models() -> None:
     """List the registered embedder keys."""
     for key in list_model_keys():
         console.print(key)
 
 
-@click.command(name="list-families")
+@models_group.command(name="families")
 def list_families() -> None:
     """List the registered model families and their member keys."""
     families = list_model_families()

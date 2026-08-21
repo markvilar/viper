@@ -25,14 +25,14 @@ def test_megaloc_variants_share_one_family() -> None:
     ]
 
 
-def test_list_models_command_lists_keys() -> None:
-    result = CliRunner().invoke(cli, ["list-models"])
+def test_models_list_command_lists_keys() -> None:
+    result = CliRunner().invoke(cli, ["models", "list"])
     assert result.exit_code == 0
     assert "megaloc-512d" in result.output
 
 
-def test_list_families_command_groups_keys() -> None:
-    result = CliRunner().invoke(cli, ["list-families"])
+def test_models_families_command_groups_keys() -> None:
+    result = CliRunner().invoke(cli, ["models", "families"])
     assert result.exit_code == 0
     assert "megaloc" in result.output
     assert "megaloc-512d" in result.output

@@ -1,7 +1,7 @@
 """
-The model-listing CLI commands: ``list-models`` and ``list-families``.
+The ``models`` CLI subgroup: ``models list`` and ``models families``.
 """
 
-from .commands import list_families, list_models
+from .commands import models_group
 
-__all__ = ["list_families", "list_models"]
+__all__ = ["models_group"]
