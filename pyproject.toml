@@ -23,9 +23,11 @@ dependencies = [
   "pytorch-lightning>=2.6.0", # NOTE: required by cliquemining
   "fast-pytorch-kmeans>=0.2.2", # NOTE: required by anyloc
   "pytorch-metric-learning>=2.9.0", # NOTE: required by cliquemining and salad
+  "click>=8.1.7",
 ]
 
 [project.scripts]
+viper = "viper.cli.entrypoint:main"
 
 [build-system]
 requires = ["hatchling"]
