@@ -16,7 +16,6 @@ dependencies = [
   "ruff>=0.8.3",
   "torch>=2.7.0",
   "torchvision>=0.24.0",
-  "tqdm>=4.67.1",
   "scipy>=1.16.0",
   "einops>=0.8.1", # NOTE: required by anyloc
   "xformers>=0.0.30", # NOTE: required by megaloc
@@ -24,6 +23,7 @@ dependencies = [
   "fast-pytorch-kmeans>=0.2.2", # NOTE: required by anyloc
   "pytorch-metric-learning>=2.9.0", # NOTE: required by cliquemining and salad
   "click>=8.1.7",
+  "rich>=15.0.0",
 ]
 
 [project.scripts]

@@ -9,6 +9,8 @@ from pathlib import Path
 
 import click
 
+from viper.cli.console import console
+
 from .actions import adapt_model
 
 
@@ -61,4 +63,4 @@ def adapt(
         )
     except ValueError as error:
         raise click.ClickException(str(error)) from error
-    click.echo(f"Wrote {path}")
+    console.print(f"Wrote [bold]{path}[/bold]")
