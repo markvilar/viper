@@ -191,7 +191,7 @@ class MixVPRWrapper(torch.nn.Module):
         return self.impl.forward(images)
 
 
-@register_embedder_factory(key="mixvpr")
+@register_embedder_factory(key="mixvpr", family="mixvpr")
 def load_mixvpr() -> ImageEmbedder:
     """Loads a MixVPR model."""
     model_config: dict[str, int] = {

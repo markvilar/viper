@@ -74,7 +74,7 @@ class AnyLocWrapper(torch.nn.Module):
         return self._impl(images_resized)
 
 
-@register_embedder_factory(key="anyloc")
+@register_embedder_factory(key="anyloc", family="anyloc")
 def load_anyloc() -> ImageEmbedder:
     """Loads an AnyLoc model."""
     # NOTE: AnyLoc requires CUDA to run, hence we assert

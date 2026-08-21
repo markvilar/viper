@@ -267,7 +267,7 @@ def denormalize_images(
     return torch.clamp(batch, 0, 1).permute(3, 0, 1, 2)
 
 
-@register_embedder_factory(key="netvlad")
+@register_embedder_factory(key="netvlad", family="netvlad")
 def load_netvlad() -> ImageEmbedder:
     """
     Creates a wrapper for a NetVLAD model.
