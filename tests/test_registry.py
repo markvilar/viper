@@ -8,6 +8,7 @@ from typing import Any
 from viper import (
     register_embedder_factory,
     get_embedder_factory_registry,
+    get_embedder_families,
 )
 from viper import (
     ImageEmbedder,
@@ -20,7 +21,7 @@ def test_registers_factory_in_registry() -> None:
     registry_before: dict[str, ImageEmbedderFactory] = get_embedder_factory_registry()
     assert "test_embedder" not in registry_before
 
-    @register_embedder_factory("test_embedder")
+    @register_embedder_factory("test_embedder", family="test_embedder")
     def factory() -> ImageEmbedder:
         class DummyEmbedder:
             def __call__(self, image: Any) -> list[float]:
@@ -38,7 +39,7 @@ def test_registers_factory_in_registry() -> None:
 
 def test_registered_factory_is_callable_and_returns_embedder() -> None:
     # Arrange
-    @register_embedder_factory("callable_embedder")
+    @register_embedder_factory("callable_embedder", family="callable_embedder")
     def factory() -> ImageEmbedder:
         class DummyEmbedder:
             def __call__(self, image: Any) -> list[float]:
@@ -69,3 +70,20 @@ def test_registry_copy_is_isolated() -> None:
     # Modifying the returned dict must not affect the internal registry
     internal_registry: dict[str, ImageEmbedderFactory] = get_embedder_factory_registry()
     assert "new_key" not in internal_registry
+
+
+def test_groups_registered_keys_by_family() -> None:
+    # Arrange
+    @register_embedder_factory("family_canonical", family="grouped")
+    def canonical() -> ImageEmbedder:
+        return None  # type: ignore[return-value]
+
+    @register_embedder_factory("family_variant", family="grouped")
+    def variant() -> ImageEmbedder:
+        return None  # type: ignore[return-value]
+
+    # Act
+    families: dict[str, list[str]] = get_embedder_families()
+
+    # Assert
+    assert families["grouped"] == ["family_canonical", "family_variant"]

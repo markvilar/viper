@@ -85,7 +85,7 @@ class CosPlaceWrapper(torch.nn.Module):
         return self.impl.forward(images)
 
 
-@register_embedder_factory(key="cosplace")
+@register_embedder_factory(key="cosplace", family="cosplace")
 def load_cosplace() -> ImageEmbedder:
     """
     Loads a CosPlace model from torch hub and adds it to a wrapper.

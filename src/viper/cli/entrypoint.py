@@ -9,6 +9,7 @@ Defines the root ``viper`` command group and wires in its subgroups. The
 import click
 
 from viper.cli.forge import forge_group
+from viper.cli.models import list_families, list_models
 
 
 @click.group(name="viper")
@@ -17,6 +18,8 @@ def cli() -> None:
 
 
 cli.add_command(forge_group, name="forge")
+cli.add_command(list_models, name="list-models")
+cli.add_command(list_families, name="list-families")
 
 
 def main() -> None:

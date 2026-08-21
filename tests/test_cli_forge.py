@@ -18,7 +18,11 @@ from click.testing import CliRunner
 from viper.cli.entrypoint import cli
 from viper.cli.forge import actions
 from viper.forge.registry import _forges, register_forge
-from viper.registry import _embedder_factories, register_embedder_factory
+from viper.registry import (
+    _embedder_factories,
+    _embedder_families,
+    register_embedder_factory,
+)
 
 _TEST_MODEL_KEY = "dummy"
 _TEST_METHOD = "svd"
@@ -27,7 +31,7 @@ _TEST_METHOD = "svd"
 @pytest.fixture
 def registered_dummy() -> None:
     # Arrange a dummy factory + forge, cleaned up afterwards.
-    @register_embedder_factory(key=_TEST_MODEL_KEY)
+    @register_embedder_factory(key=_TEST_MODEL_KEY, family=_TEST_MODEL_KEY)
     def _load_dummy() -> nn.Module:
         return nn.Linear(8, 16)
 
@@ -40,6 +44,7 @@ def registered_dummy() -> None:
     yield
 
     _embedder_factories.pop(_TEST_MODEL_KEY, None)
+    _embedder_families.pop(_TEST_MODEL_KEY, None)
     _forges.pop((_TEST_MODEL_KEY, _TEST_METHOD), None)
 
 
