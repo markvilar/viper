@@ -53,10 +53,16 @@ class MegaLocModel(nn.Module):
         return next(self.parameters()).device
 
     def forward(self, images: Tensor) -> Tensor:
+        if images.dim() != 4:
+            raise ValueError(
+                f"expected a 4D batch (B, C, H, W), got shape {tuple(images.shape)}"
+            )
         if images.shape[1] == 1:
             images = convert_grayscale_batch_to_rgb(images)
-        assert images.dim() == 4, f"expected (B, C, H, W), got {images.shape}"
-        assert images.shape[1] == 3, f"expected 3 channels, got {images.shape[1]}"
+        if images.shape[1] != 3:
+            raise ValueError(
+                f"expected 1 or 3 channels, got {images.shape[1]}"
+            )
         return self.aggregator(self.backbone(images))
 
 
