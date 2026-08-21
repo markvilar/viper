@@ -53,3 +53,23 @@ def resize_image_batch(
         images, desired_size, antialias=True
     )
     return images_resized
+
+
+def resize_to_patch_multiple(
+    images: torch.Tensor, patch_size: int
+) -> torch.Tensor:
+    """
+    Resizes an image batch so that height and width are multiples of patch_size.
+
+    Arguments:
+        images - torch.Tensor of shape BxCxHxW
+        patch_size - int, the patch size to align to
+    Returns:
+        torch.Tensor of shape BxCxH'xW' where H', W' are multiples of patch_size
+    """
+    B, C, H, W = images.shape
+    desired_h: int = (H // patch_size) * patch_size
+    desired_w: int = (W // patch_size) * patch_size
+    if desired_h == H and desired_w == W:
+        return images
+    return tfm.functional.resize(images, (desired_h, desired_w), antialias=True)
