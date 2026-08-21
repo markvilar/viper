@@ -2,16 +2,23 @@
 MegaLoc composite model.
 """
 
+from collections.abc import Mapping
 from typing import Any
 
 import torch
 import torch.nn as nn
 from torch import Tensor
 
-from viper.models.helpers import convert_grayscale_batch_to_rgb
+from viper.models.helpers import (
+    convert_grayscale_batch_to_rgb,
+    extract_submodule_state_dict,
+)
 
-from .aggregation import MegaLocAggregationModule
-from .backbone import MegaLocBackboneModule
+from .aggregation import (
+    MegaLocAggregationModule,
+    build_megaloc_aggregation_from_state_dict,
+)
+from .backbone import MegaLocBackboneModule, build_megaloc_backbone_from_state_dict
 
 
 class MegaLocModel(nn.Module):
@@ -51,3 +58,26 @@ class MegaLocModel(nn.Module):
         assert images.dim() == 4, f"expected (B, C, H, W), got {images.shape}"
         assert images.shape[1] == 3, f"expected 3 channels, got {images.shape[1]}"
         return self.aggregator(self.backbone(images))
+
+
+def build_megaloc_from_state_dict(state_dict: Mapping[str, Tensor]) -> MegaLocModel:
+    """
+    Build a MegaLoc model from a full checkpoint state dict.
+
+    Components are built and loaded bottom-up from their respective slices of the
+    state dict and then composed — no dimension is hardcoded and no load-time
+    remapping is performed (the checkpoint keys are pre-aligned to the module
+    hierarchy: "backbone.*" and "aggregator.*").
+
+    Arguments:
+        state_dict - full MegaLoc state dict
+    Returns:
+        MegaLocModel with all weights loaded
+    """
+    backbone = build_megaloc_backbone_from_state_dict(
+        extract_submodule_state_dict(state_dict, "backbone.")
+    )
+    aggregator = build_megaloc_aggregation_from_state_dict(
+        extract_submodule_state_dict(state_dict, "aggregator.")
+    )
+    return MegaLocModel(backbone=backbone, aggregator=aggregator)

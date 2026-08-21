@@ -2,8 +2,30 @@
 Module with helper functionality for image embedding.
 """
 
+from collections.abc import Mapping
+
 import torch
 import torchvision.transforms as tfm
+
+
+def extract_submodule_state_dict(
+    state_dict: Mapping[str, torch.Tensor], prefix: str
+) -> dict[str, torch.Tensor]:
+    """
+    Extracts the entries of a state dict belonging to a submodule, with the prefix
+    stripped so the result can be loaded into that submodule directly.
+
+    Arguments:
+        state_dict - mapping of parameter name to tensor
+        prefix - submodule key prefix to select and strip, e.g. "backbone."
+    Returns:
+        dict mapping the stripped parameter name to tensor
+    """
+    return {
+        key[len(prefix):]: value
+        for key, value in state_dict.items()
+        if key.startswith(prefix)
+    }
 
 
 def convert_grayscale_batch_to_rgb(images: torch.Tensor) -> torch.Tensor:

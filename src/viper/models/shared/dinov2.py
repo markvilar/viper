@@ -5,6 +5,7 @@ Adapted from the MegaLoc reference implementation (gmberton/MegaLoc, MIT license
 """
 
 import math
+from collections.abc import Mapping
 
 import torch
 import torch.nn as nn
@@ -238,3 +239,21 @@ def build_dinov2_vitb14() -> DINOv2:
         mlp_ratio=4.0,
         qkv_bias=True,
     )
+
+
+def build_dinov2_vitb14_from_state_dict(state_dict: Mapping[str, Tensor]) -> DINOv2:
+    """
+    Construct a DINOv2 ViT-B/14 backbone and load weights from a state dict.
+
+    The ViT-B/14 architecture is fixed by definition (num_heads in particular is
+    not recoverable from any weight shape), so the module is built with the known
+    architecture and the weights are loaded strictly — a mismatch raises.
+
+    Arguments:
+        state_dict - DINOv2 state dict (keys relative to the DINOv2 module)
+    Returns:
+        DINOv2 module with the given weights loaded (strict)
+    """
+    dinov2 = build_dinov2_vitb14()
+    dinov2.load_state_dict(state_dict, strict=True)
+    return dinov2

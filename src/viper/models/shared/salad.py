@@ -7,6 +7,7 @@ https://github.com/ucuapps/OpenGlue
 """
 
 import math
+from collections.abc import Mapping
 
 import torch
 import torch.nn as nn
@@ -116,7 +117,7 @@ class SALAD(nn.Module):
         self.dust_bin = nn.Parameter(torch.tensor(1.0))
 
     @property
-    def out_dim(self) -> int:
+    def output_dim(self) -> int:
         return self.num_clusters * self.cluster_dim + self.token_dim
 
     def forward(self, x: tuple[Tensor, Tensor]) -> Tensor:
@@ -156,3 +157,42 @@ def build_salad(dropout: float = 0.0) -> SALAD:
         mlp_dim=512,
         dropout=dropout,
     )
+
+
+def build_salad_from_state_dict(
+    state_dict: Mapping[str, Tensor], dropout: float = 0.0
+) -> SALAD:
+    """
+    Construct a SALAD aggregator whose configuration is derived from the weight
+    shapes in a state dict, then load those weights.
+
+    All dimensions are inferred from the weights so the factory works for any
+    SALAD variant, not just the MegaLoc default:
+
+        num_channels <- token_features.0.weight  (in_features)
+        mlp_dim      <- token_features.0.weight  (out_features)
+        token_dim    <- token_features.2.weight  (out_features)
+        cluster_dim  <- cluster_features.3.weight (out_channels)
+        num_clusters <- score.3.weight            (out_channels)
+
+    Arguments:
+        state_dict - SALAD state dict (keys relative to the SALAD module)
+        dropout - dropout probability for the constructed module
+    Returns:
+        SALAD module with the given weights loaded (strict)
+    """
+    token_features_in = state_dict["token_features.0.weight"]
+    token_features_out = state_dict["token_features.2.weight"]
+    cluster_features_out = state_dict["cluster_features.3.weight"]
+    score_out = state_dict["score.3.weight"]
+
+    salad = SALAD(
+        num_channels=token_features_in.shape[1],
+        num_clusters=score_out.shape[0],
+        cluster_dim=cluster_features_out.shape[0],
+        token_dim=token_features_out.shape[0],
+        mlp_dim=token_features_in.shape[0],
+        dropout=dropout,
+    )
+    salad.load_state_dict(state_dict, strict=True)
+    return salad
