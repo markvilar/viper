@@ -7,6 +7,26 @@ authors = [
   { name = "Martin Kvisvik Larsen", email = "martin.kvisvik.larsen@hotmail.com" }
 ]
 requires-python = ">=3.12"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+keywords = [
+  "visual place recognition",
+  "vpr",
+  "image retrieval",
+  "computer vision",
+  "deep learning",
+  "pytorch",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Scientific/Engineering :: Image Recognition",
+]
 dependencies = [
   "imageio>=2.37.0",
   "loguru>=0.7.3",
@@ -22,6 +42,11 @@ dependencies = [
   "click>=8.1.7",
   "rich>=15.0.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/markvilar/viper"
+Repository = "https://github.com/markvilar/viper"
+Issues = "https://github.com/markvilar/viper/issues"
 
 [project.scripts]
 viper = "viper.cli.entrypoint:main"
