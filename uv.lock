@@ -358,7 +358,7 @@ wheels = [
 
 [[package]]
 name = "libviper"
-version = "0.3.1.dev8+gc3a4c659c.d20260822"
+version = "0.3.1.dev10+g73ccb37e6.d20260822"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
@@ -367,12 +367,10 @@ dependencies = [
     { name = "imageio" },
     { name = "loguru" },
     { name = "msgspec" },
-    { name = "pytest" },
     { name = "python-dotenv" },
     { name = "pytorch-lightning" },
     { name = "pytorch-metric-learning" },
     { name = "rich" },
-    { name = "ruff" },
     { name = "scipy" },
     { name = "torch" },
     { name = "torchvision" },
@@ -380,6 +378,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "pytest" },
     { name = "ruff" },
 ]
 
@@ -391,19 +390,20 @@ requires-dist = [
     { name = "imageio", specifier = ">=2.37.0" },
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "msgspec", specifier = ">=0.19.0" },
-    { name = "pytest", specifier = ">=8.3.4" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
     { name = "pytorch-lightning", specifier = ">=2.6.0" },
     { name = "pytorch-metric-learning", specifier = ">=2.9.0" },
     { name = "rich", specifier = ">=15.0.0" },
-    { name = "ruff", specifier = ">=0.8.3" },
     { name = "scipy", specifier = ">=1.16.0" },
     { name = "torch", specifier = ">=2.7.0" },
     { name = "torchvision", specifier = ">=0.24.0" },
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "ruff", specifier = ">=0.8.3" }]
+dev = [
+    { name = "pytest", specifier = ">=8.3.4" },
+    { name = "ruff", specifier = ">=0.8.3" },
+]
 
 [[package]]
 name = "lightning-utilities"
