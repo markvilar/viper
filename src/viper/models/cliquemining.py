@@ -18,7 +18,9 @@ from .helpers import convert_grayscale_batch_to_rgb
 from .helpers import resize_image_batch
 
 
-CLIQUE_MINING_CHECKPOINT_URL: str = "https://github.com/markvilar/viper/releases/download/v0.0.1/cliquemining.ckpt"
+CLIQUE_MINING_CHECKPOINT_URL: str = (
+    "https://github.com/markvilar/viper/releases/download/v0.0.1/cliquemining.ckpt"
+)
 
 
 class CliqueMiningWrapper(torch.nn.Module):

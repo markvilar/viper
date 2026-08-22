@@ -16,7 +16,7 @@ from viper.models.shared.dinov2 import DINOv2, build_dinov2_vitb14_from_state_di
 
 
 class DinoFeatures(NamedTuple):
-    patches: Tensor    # (B, C, H/14, W/14)
+    patches: Tensor  # (B, C, H/14, W/14)
     cls_token: Tensor  # (B, C)
 
 

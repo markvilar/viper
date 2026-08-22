@@ -22,7 +22,7 @@ def extract_submodule_state_dict(
         dict mapping the stripped parameter name to tensor
     """
     return {
-        key[len(prefix):]: value
+        key[len(prefix) :]: value
         for key, value in state_dict.items()
         if key.startswith(prefix)
     }
@@ -77,9 +77,7 @@ def resize_image_batch(
     return images_resized
 
 
-def resize_to_patch_multiple(
-    images: torch.Tensor, patch_size: int
-) -> torch.Tensor:
+def resize_to_patch_multiple(images: torch.Tensor, patch_size: int) -> torch.Tensor:
     """
     Resizes an image batch so that height and width are multiples of patch_size.
 
