@@ -9,6 +9,8 @@ plays no role in lookup; it exists purely for enumeration.
 """
 
 from collections.abc import Callable
+from collections.abc import Iterable
+from dataclasses import dataclass
 from functools import wraps
 from typing import Any
 from viper.types import ImageEmbedder
@@ -46,6 +48,34 @@ def register_embedder_factory(
         return wrapper
 
     return decorator
+
+
+@dataclass(frozen=True)
+class EmbedderRegistrationEntry:
+    """A declarative registration for a remote-URL-backed embedder."""
+
+    key: str
+    """Flat lookup key for the variant (e.g. "megaloc-512d")."""
+
+    family: str
+    """Grouping label for related keys (e.g. "megaloc"); enumeration only."""
+
+    checkpoint_url: str
+    """URL the variant is built from (state-dict checkpoint, hub repo, ...)."""
+
+    factory: Callable[[str], ImageEmbedder]
+    """Builds the embedder from the URL; owns the load strategy end to end."""
+
+
+def register_embedder_entries(entries: Iterable[EmbedderRegistrationEntry]) -> None:
+    """Registers each entry as a standard (key, family) -> factory registration."""
+    for entry in entries:
+
+        @register_embedder_factory(entry.key, family=entry.family)
+        def _factory_wrapper(
+            entry: EmbedderRegistrationEntry = entry,
+        ) -> ImageEmbedder:
+            return entry.factory(entry.checkpoint_url)
 
 
 def get_embedder_factory_registry() -> dict[str, ImageEmbedderFactory]:
