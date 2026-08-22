@@ -3,6 +3,9 @@
 ![build-ubuntu](https://github.com/markvilar/viper/actions/workflows/build-ubuntu.yml/badge.svg)
 ![build-windows](https://github.com/markvilar/viper/actions/workflows/build-windows.yml/badge.svg)
 ![build-macos](https://github.com/markvilar/viper/actions/workflows/build-macos.yml/badge.svg)
+![release](https://img.shields.io/github/v/release/markvilar/viper)
+![license](https://img.shields.io/github/license/markvilar/viper)
+![python](https://img.shields.io/badge/python-3.12-blue)
 
 This Python package provides a **unified** image embedder interface for visual place recognition (VPR), along with wrapper implementations of several state-of-the-art VPR models so they all expose the same API.
 It also includes a lightweight registry mechanism that lets you register custom embedders and retrieve them by string key.
@@ -71,7 +74,7 @@ import viper
 factory: viper.ImageEmbedderFactory = viper.get_embedder_factory("netvlad")
 embedder: viper.ImageEmbedder = factory()
 images: torch.Tensor = torch.rand(8, 3, 480, 640)  # example batch, normalized to [0, 1]
-embeddings: torch.Tensor = embedder(images)        # shape: (8, embedder.vectorsize)
+embeddings: torch.Tensor = embedder(images)        # shape: (8, embedder.vector_size)
 ```
 
 Wrappers handle grayscale input by converting 1-channel batches to 3-channel RGB internally.
@@ -108,7 +111,7 @@ class MyEmbedder(torch.nn.Module):
         ...
 
 # Factory that returns an ImageEmbedder instance
-@register_embedder_factory(key="myembedder")
+@register_embedder_factory(key="myembedder", family="myembedder")
 def load_myembedder() -> ImageEmbedder:
     model = MyEmbedder()
     return model
