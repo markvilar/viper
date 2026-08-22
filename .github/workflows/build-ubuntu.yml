@@ -1,0 +1,9 @@
+name: build-ubuntu
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+    with:
+      os: ubuntu-latest

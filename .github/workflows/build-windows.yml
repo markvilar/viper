@@ -1,0 +1,9 @@
+name: build-windows
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+    with:
+      os: windows-latest
