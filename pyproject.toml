@@ -1,6 +1,6 @@
 [project]
 name = "libviper"
-version = "0.3.0"
+dynamic = ["version"]
 description = "A package for visual place recognition (VPR) models."
 readme = "README.md"
 authors = [
@@ -18,7 +18,6 @@ dependencies = [
   "torchvision>=0.24.0",
   "scipy>=1.16.0",
   "einops>=0.8.1", # NOTE: required by anyloc
-  "xformers>=0.0.30", # NOTE: required by megaloc
   "pytorch-lightning>=2.6.0", # NOTE: required by cliquemining
   "fast-pytorch-kmeans>=0.2.2", # NOTE: required by anyloc
   "pytorch-metric-learning>=2.9.0", # NOTE: required by cliquemining and salad
@@ -30,8 +29,11 @@ dependencies = [
 viper = "viper.cli.entrypoint:main"
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
 
 [tool.hatch.build]
 include = ["src/viper"]

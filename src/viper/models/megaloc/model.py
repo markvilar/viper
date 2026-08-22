@@ -60,9 +60,7 @@ class MegaLocModel(nn.Module):
         if images.shape[1] == 1:
             images = convert_grayscale_batch_to_rgb(images)
         if images.shape[1] != 3:
-            raise ValueError(
-                f"expected 1 or 3 channels, got {images.shape[1]}"
-            )
+            raise ValueError(f"expected 1 or 3 channels, got {images.shape[1]}")
         return self.aggregator(self.backbone(images))
 
 

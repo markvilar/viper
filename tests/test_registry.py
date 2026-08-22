@@ -7,7 +7,10 @@ from typing import Any
 
 from viper import (
     register_embedder_factory,
+    register_embedder_entries,
+    EmbedderRegistrationEntry,
     get_embedder_factory_registry,
+    get_embedder_factory,
     get_embedder_families,
 )
 from viper import (
@@ -87,3 +90,45 @@ def test_groups_registered_keys_by_family() -> None:
 
     # Assert
     assert families["grouped"] == ["family_canonical", "family_variant"]
+
+
+def test_registers_entries_as_key_family_factories() -> None:
+    # Arrange
+    class DummyEmbedder:
+        def __init__(self, url: str) -> None:
+            self.url = url
+
+        def __call__(self, image: Any) -> str:
+            return self.url
+
+    def factory(url: str) -> ImageEmbedder:
+        return DummyEmbedder(url)  # type: ignore[return-value]
+
+    entries = [
+        EmbedderRegistrationEntry(
+            key="entry-a",
+            family="entries",
+            checkpoint_url="https://example.com/a.pth",
+            factory=factory,
+        ),
+        EmbedderRegistrationEntry(
+            key="entry-b",
+            family="entries",
+            checkpoint_url="https://example.com/b.pth",
+            factory=factory,
+        ),
+    ]
+
+    # Act
+    register_embedder_entries(entries)
+
+    # Assert
+    assert get_embedder_families()["entries"] == ["entry-a", "entry-b"]
+
+    factory_a = get_embedder_factory("entry-a")
+    factory_b = get_embedder_factory("entry-b")
+    assert factory_a is not None and factory_b is not None
+
+    # Each wrapper binds its own entry's URL (no late-binding closure bug).
+    assert factory_a()("img") == "https://example.com/a.pth"
+    assert factory_b()("img") == "https://example.com/b.pth"
