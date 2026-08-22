@@ -1,4 +1,4 @@
-name: ubuntu
+name: build-windows
 
 on: [push, pull_request]
 
@@ -6,9 +6,9 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  build-windows:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -31,18 +31,18 @@ jobs:
 
     - name: Pin python version
       run: uv python pin 3.12
-    
+
     - name: Install the project
       run: uv sync --all-extras --dev
 
     - name: Build project
       run: uv build
-    
+
     - name: Linter code with ruff
       run: uv run ruff check
-  
+
     - name: Format code with ruff
       run: uv run ruff format
-    
+
     - name: Run tests
       run: uv run pytest
