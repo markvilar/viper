@@ -6,6 +6,8 @@ import viper.models as models  # noqa: F401
 
 from .registry import FactoryRegistry as FactoryRegistry
 from .registry import register_embedder_factory as register_embedder_factory
+from .registry import EmbedderRegistrationEntry as EmbedderRegistrationEntry
+from .registry import register_embedder_entries as register_embedder_entries
 from .registry import get_embedder_factory_registry as get_embedder_factory_registry
 from .registry import get_embedder_factory as get_embedder_factory
 from .registry import get_embedder_families as get_embedder_families
