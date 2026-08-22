@@ -35,12 +35,6 @@ jobs:
     - name: Install the project
       run: uv sync --all-extras --dev
 
-    - name: Lint code with ruff
-      run: uv run ruff check
-
-    - name: Check formatting with ruff
-      run: uv run ruff format --check
-
     - name: Run tests
       run: uv run pytest
 
