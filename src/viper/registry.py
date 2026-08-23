@@ -4,7 +4,8 @@ Module for image embedder model registry.
 Factories register under a flat string ``key`` (the identity used for lookup)
 and carry a required ``family`` label that groups related keys — most immediately
 the variants of a single model that differ only in configuration, such as the
-SVD-truncated MegaLoc checkpoints (``megaloc``, ``megaloc-512d``, ...). ``family``
+SVD-truncated MegaLoc checkpoints (``megaloc``, ``megaloc-512d-svd-truncated``,
+...). ``family``
 plays no role in lookup; it exists purely for enumeration.
 """
 
@@ -33,7 +34,7 @@ def register_embedder_factory(
     Registers an image embedder factory.
 
     Arguments:
-        key    - flat lookup key for the factory (e.g. "megaloc-512d")
+        key    - flat lookup key for the factory (e.g. "megaloc-512d-svd-truncated")
         family - grouping label for related keys (e.g. "megaloc"); used only for
                  enumeration, never for lookup
     """
@@ -55,7 +56,7 @@ class EmbedderRegistrationEntry:
     """A declarative registration for a remote-URL-backed embedder."""
 
     key: str
-    """Flat lookup key for the variant (e.g. "megaloc-512d")."""
+    """Flat lookup key for the variant (e.g. "megaloc-512d-svd-truncated")."""
 
     family: str
     """Grouping label for related keys (e.g. "megaloc"); enumeration only."""
