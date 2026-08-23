@@ -40,8 +40,7 @@ _ENTRIES = [
         key="megaloc-256d-svd-truncated",
         family=_FAMILY,
         checkpoint_url=(
-            f"{_RELEASES}/megaloc-svd-truncated-v1.0"
-            "/megaloc-256d-svd-truncated-v1.pth"
+            f"{_RELEASES}/megaloc-svd-truncated-v1.0/megaloc-256d-svd-truncated-v1.pth"
         ),
         factory=_load_megaloc_from_url,
     ),
@@ -49,8 +48,7 @@ _ENTRIES = [
         key="megaloc-512d-svd-truncated",
         family=_FAMILY,
         checkpoint_url=(
-            f"{_RELEASES}/megaloc-svd-truncated-v1.0"
-            "/megaloc-512d-svd-truncated-v1.pth"
+            f"{_RELEASES}/megaloc-svd-truncated-v1.0/megaloc-512d-svd-truncated-v1.pth"
         ),
         factory=_load_megaloc_from_url,
     ),
@@ -58,8 +56,7 @@ _ENTRIES = [
         key="megaloc-1024d-svd-truncated",
         family=_FAMILY,
         checkpoint_url=(
-            f"{_RELEASES}/megaloc-svd-truncated-v1.0"
-            "/megaloc-1024d-svd-truncated-v1.pth"
+            f"{_RELEASES}/megaloc-svd-truncated-v1.0/megaloc-1024d-svd-truncated-v1.pth"
         ),
         factory=_load_megaloc_from_url,
     ),
