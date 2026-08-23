@@ -72,8 +72,42 @@ package = true
 [tool.ruff]
 line-length = 88 # default line width of ruff format
 
+[tool.mypy]
+files = ["src/viper"]
+python_version = "3.12"
+# Pragmatic baseline: the checker lands green today and enforces the annotations
+# we do write, without demanding a full-strict sweep of the torch-heavy model
+# code up front. Strictness is intended to be ratcheted up over time.
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_unused_configs = true
+# Many scientific dependencies ship no type stubs; silence the resulting
+# import-untyped noise so it does not drown out findings in our own code.
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# The concrete nn.Module subclasses read submodule attributes that mypy widens
+# to `Module | Tensor`, producing union-attr/operator/index noise inherent to
+# torch rather than real defects. The forge/adapter paths likewise round-trip
+# concrete modules through the ImageEmbedder protocol, which does not expose
+# nn.Module surface such as `.to()`. Relaxed until the interfaces settle.
+module = ["viper.models.*", "viper.forge.*", "viper.cli.forge.*"]
+disable_error_code = [
+  "union-attr",
+  "index",
+  "operator",
+  "no-any-return",
+  "no-redef",
+  "arg-type",
+  "attr-defined",
+  "return-value",
+  "call-arg",
+  "assignment",
+]
+
 [dependency-groups]
 dev = [
   "pytest>=8.3.4",
   "ruff>=0.8.3",
+  "mypy>=1.13.0",
 ]
