@@ -25,7 +25,7 @@ class ImageEmbedder(typing.Protocol):
         ...
 
     @property
-    def device(self) -> str:
+    def device(self) -> torch.device:
         """Returns the device of the embedder."""
         ...
 
@@ -52,4 +52,4 @@ class ImageEmbedder(typing.Protocol):
         ...
 
 
-type ImageEmbedderFactory = Callable[[...], ImageEmbedder]
+type ImageEmbedderFactory = Callable[..., ImageEmbedder]
