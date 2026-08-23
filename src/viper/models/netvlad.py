@@ -233,7 +233,7 @@ class NetVLAD(torch.nn.Module):
         descriptors: torch.Tensor = F.normalize(
             descriptors, dim=1
         )  # Pre-normalization.
-        descriptors: torch.Tenosr = self.netvlad_layer(descriptors)
+        descriptors: torch.Tensor = self.netvlad_layer(descriptors)
 
         # Whiten if needed.
         if hasattr(self, "whiten"):
