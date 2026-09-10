@@ -72,6 +72,17 @@ package = true
 [tool.ruff]
 line-length = 88 # default line width of ruff format
 
+[tool.ruff.lint]
+# Pin the enabled rules explicitly rather than inheriting Ruff's evolving
+# default set, so version bumps do not silently introduce new violations.
+# Mirrors the historical default: pycodestyle (subset) and Pyflakes.
+select = ["E4", "E7", "E9", "F"]
+
+[tool.ruff.format]
+# Leave Python snippets inside Markdown untouched. Formatting them is not
+# behaviour we opt into; keeping it off avoids churn in documentation.
+exclude = ["*.md"]
+
 [tool.mypy]
 files = ["src/viper"]
 python_version = "3.12"
