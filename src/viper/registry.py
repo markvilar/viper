@@ -20,6 +20,7 @@ from viper.types import ImageEmbedderFactory
 
 _embedder_factories: dict[str, ImageEmbedderFactory] = dict()
 _embedder_families: dict[str, str] = dict()
+_embedder_labels: dict[str, str] = dict()
 
 
 type FactoryRegistry = dict[str, ImageEmbedderFactory]
@@ -28,6 +29,7 @@ type FactoryRegistry = dict[str, ImageEmbedderFactory]
 def register_embedder_factory(
     key: str,
     *,
+    label: str | None = None,
     family: str,
 ) -> Callable[[ImageEmbedderFactory], ImageEmbedderFactory]:
     """
@@ -35,17 +37,21 @@ def register_embedder_factory(
 
     Arguments:
         key    - flat lookup key for the factory (e.g. "megaloc-512d-svd-truncated")
+        label  - presentation string for the factory (e.g. "MegaLoc 512D
+                 SVD-Truncated"); defaults to ``key`` when omitted
         family - grouping label for related keys (e.g. "megaloc"); used only for
                  enumeration, never for lookup
     """
+    resolved_label = label if label is not None else key
 
     def decorator(func: ImageEmbedderFactory) -> ImageEmbedderFactory:
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> ImageEmbedder:
-            return func(*args, **kwargs)
+            return func(key, resolved_label, *args, **kwargs)
 
         _embedder_factories[key] = wrapper
         _embedder_families[key] = family
+        _embedder_labels[key] = resolved_label
         return wrapper
 
     return decorator
@@ -58,25 +64,30 @@ class EmbedderRegistrationEntry:
     key: str
     """Flat lookup key for the variant (e.g. "megaloc-512d-svd-truncated")."""
 
+    label: str
+    """Presentation string for the variant (e.g. "MegaLoc 512D SVD-Truncated")."""
+
     family: str
     """Grouping label for related keys (e.g. "megaloc"); enumeration only."""
 
     checkpoint_url: str
     """URL the variant is built from (state-dict checkpoint, hub repo, ...)."""
 
-    factory: Callable[[str], ImageEmbedder]
-    """Builds the embedder from the URL; owns the load strategy end to end."""
+    factory: Callable[[str, str, str], ImageEmbedder]
+    """Builds the embedder from (url, key, label); owns the load strategy end to end."""
 
 
 def register_embedder_entries(entries: Iterable[EmbedderRegistrationEntry]) -> None:
     """Registers each entry as a standard (key, family) -> factory registration."""
     for entry in entries:
 
-        @register_embedder_factory(entry.key, family=entry.family)
+        @register_embedder_factory(entry.key, label=entry.label, family=entry.family)
         def _factory_wrapper(
+            key: str,
+            label: str,
             entry: EmbedderRegistrationEntry = entry,
         ) -> ImageEmbedder:
-            return entry.factory(entry.checkpoint_url)
+            return entry.factory(entry.checkpoint_url, key, label)
 
 
 def get_embedder_factory_registry() -> dict[str, ImageEmbedderFactory]:

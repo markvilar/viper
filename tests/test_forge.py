@@ -22,7 +22,12 @@ def _build_megaloc(descriptor_dim: int, feature_dim: int = 16) -> MegaLocModel:
     salad = nn.Identity()
     linear = nn.Linear(feature_dim, descriptor_dim)
     aggregator = MegaLocAggregationModule(salad=salad, linear=linear)  # type: ignore[arg-type]
-    return MegaLocModel(backbone=backbone, aggregator=aggregator)  # type: ignore[arg-type]
+    return MegaLocModel(
+        backbone=backbone,  # type: ignore[arg-type]
+        aggregator=aggregator,
+        key="megaloc",
+        label="MegaLoc",
+    )
 
 
 def test_forge_megaloc_svd_truncated_reduces_descriptor_dim() -> None:

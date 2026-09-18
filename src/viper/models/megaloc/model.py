@@ -28,14 +28,24 @@ class MegaLocModel(nn.Module):
         self,
         backbone: MegaLocBackboneModule,
         aggregator: MegaLocAggregationModule,
+        key: str,
+        label: str,
     ) -> None:
         super().__init__()
         self.backbone = backbone
         self.aggregator = aggregator
+        self._key = key
+        self._label = label
 
     @property
-    def name(self) -> str:
-        return "megaloc"
+    def key(self) -> str:
+        """Returns the registry lookup key of the embedder."""
+        return self._key
+
+    @property
+    def label(self) -> str:
+        """Returns the presentation label of the embedder."""
+        return self._label
 
     @property
     def vector_size(self) -> int:
@@ -64,7 +74,9 @@ class MegaLocModel(nn.Module):
         return self.aggregator(self.backbone(images))
 
 
-def build_megaloc_from_state_dict(state_dict: Mapping[str, Tensor]) -> MegaLocModel:
+def build_megaloc_from_state_dict(
+    state_dict: Mapping[str, Tensor], key: str, label: str
+) -> MegaLocModel:
     """
     Build a MegaLoc model from a full checkpoint state dict.
 
@@ -75,6 +87,8 @@ def build_megaloc_from_state_dict(state_dict: Mapping[str, Tensor]) -> MegaLocMo
 
     Arguments:
         state_dict - full MegaLoc state dict
+        key        - registry lookup key of the variant
+        label      - presentation label of the variant
     Returns:
         MegaLocModel with all weights loaded
     """
@@ -84,4 +98,4 @@ def build_megaloc_from_state_dict(state_dict: Mapping[str, Tensor]) -> MegaLocMo
     aggregator = build_megaloc_aggregation_from_state_dict(
         extract_submodule_state_dict(state_dict, "aggregator.")
     )
-    return MegaLocModel(backbone=backbone, aggregator=aggregator)
+    return MegaLocModel(backbone=backbone, aggregator=aggregator, key=key, label=label)

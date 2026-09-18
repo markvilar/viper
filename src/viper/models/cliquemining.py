@@ -26,15 +26,22 @@ CLIQUE_MINING_CHECKPOINT_URL: str = (
 class CliqueMiningWrapper(torch.nn.Module):
     """Class representing a wrapper for the CliqueMining model."""
 
-    def __init__(self, impl: torch.nn.Module) -> None:
+    def __init__(self, impl: torch.nn.Module, key: str, label: str) -> None:
         """Initializer method."""
         super().__init__()
         self.impl = impl
+        self._key = key
+        self._label = label
 
     @property
-    def name(self) -> str:
-        """Returns the name of the embedder."""
-        return "cliquemining"
+    def key(self) -> str:
+        """Returns the registry lookup key of the embedder."""
+        return self._key
+
+    @property
+    def label(self) -> str:
+        """Returns the presentation label of the embedder."""
+        return self._label
 
     @property
     def vector_size(self) -> int:
@@ -98,8 +105,10 @@ class CliqueMiningWrapper(torch.nn.Module):
         return self.impl.forward(images_resized)
 
 
-@register_embedder_factory(key="cliquemining", family="cliquemining")
-def load_clique_mining() -> ImageEmbedder:
+@register_embedder_factory(
+    key="cliquemining", label="CliqueMining", family="cliquemining"
+)
+def load_clique_mining(key: str, label: str) -> ImageEmbedder:
     """
     Loads a CliqueMining wrapper by downloading SALAD from torch hub.
     """
@@ -124,4 +133,4 @@ def load_clique_mining() -> ImageEmbedder:
     state_dict: dict = checkpoint["state_dict"]
     impl.load_state_dict(state_dict)
 
-    return CliqueMiningWrapper(impl=impl)
+    return CliqueMiningWrapper(impl=impl, key=key, label=label)
