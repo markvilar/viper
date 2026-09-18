@@ -35,7 +35,7 @@ def registered_dummy() -> Generator[None, None, None]:
     # NOTE: these dummies only implement the subset of ImageEmbedder that the
     # exercised CLI path touches, not the full protocol.
     @register_embedder_factory(key=_TEST_MODEL_KEY, family=_TEST_MODEL_KEY)  # type: ignore[arg-type]
-    def _load_dummy() -> nn.Module:
+    def _load_dummy(key: str, label: str) -> nn.Module:
         return nn.Linear(8, 16)
 
     @register_forge(  # type: ignore[type-var]

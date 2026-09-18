@@ -133,15 +133,22 @@ class MixVPRImpl(torch.nn.Module):
 class MixVPRWrapper(torch.nn.Module):
     """Class representing a MixVPR wrapper."""
 
-    def __init__(self, impl: torch.nn.Module):
+    def __init__(self, impl: torch.nn.Module, key: str, label: str):
         """Initializer dunder method."""
         super().__init__()
         self.impl = impl
+        self._key = key
+        self._label = label
 
     @property
-    def name(self) -> str:
-        """Returns the name of the embedder."""
-        return "mixvpr"
+    def key(self) -> str:
+        """Returns the registry lookup key of the embedder."""
+        return self._key
+
+    @property
+    def label(self) -> str:
+        """Returns the presentation label of the embedder."""
+        return self._label
 
     @property
     def vector_size(self) -> int:
@@ -191,8 +198,8 @@ class MixVPRWrapper(torch.nn.Module):
         return self.impl.forward(images)
 
 
-@register_embedder_factory(key="mixvpr", family="mixvpr")
-def load_mixvpr() -> ImageEmbedder:
+@register_embedder_factory(key="mixvpr", label="MixVPR", family="mixvpr")
+def load_mixvpr(key: str, label: str) -> ImageEmbedder:
     """Loads a MixVPR model."""
     model_config: dict[str, int] = {
         "in_channels": 1024,
@@ -214,4 +221,4 @@ def load_mixvpr() -> ImageEmbedder:
     impl: torch.nn.Module = MixVPRImpl(agg_config=model_config)
     impl.load_state_dict(state_dict)
 
-    return MixVPRWrapper(impl=impl)
+    return MixVPRWrapper(impl=impl, key=key, label=label)

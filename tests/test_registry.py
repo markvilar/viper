@@ -25,7 +25,7 @@ def test_registers_factory_in_registry() -> None:
     assert "test_embedder" not in registry_before
 
     @register_embedder_factory("test_embedder", family="test_embedder")
-    def factory() -> ImageEmbedder:
+    def factory(key: str, label: str) -> ImageEmbedder:
         class DummyEmbedder:
             def __call__(self, image: Any) -> list[float]:
                 return [0.1, 0.2]
@@ -43,7 +43,7 @@ def test_registers_factory_in_registry() -> None:
 def test_registered_factory_is_callable_and_returns_embedder() -> None:
     # Arrange
     @register_embedder_factory("callable_embedder", family="callable_embedder")
-    def factory() -> ImageEmbedder:
+    def factory(key: str, label: str) -> ImageEmbedder:
         class DummyEmbedder:
             def __call__(self, image: Any) -> list[float]:
                 return [1.0, 2.0, 3.0]
@@ -78,11 +78,11 @@ def test_registry_copy_is_isolated() -> None:
 def test_groups_registered_keys_by_family() -> None:
     # Arrange
     @register_embedder_factory("family_canonical", family="grouped")
-    def canonical() -> ImageEmbedder:
+    def canonical(key: str, label: str) -> ImageEmbedder:
         return None  # type: ignore[return-value]
 
     @register_embedder_factory("family_variant", family="grouped")
-    def variant() -> ImageEmbedder:
+    def variant(key: str, label: str) -> ImageEmbedder:
         return None  # type: ignore[return-value]
 
     # Act
@@ -101,18 +101,20 @@ def test_registers_entries_as_key_family_factories() -> None:
         def __call__(self, image: Any) -> str:
             return self.url
 
-    def factory(url: str) -> ImageEmbedder:
+    def factory(url: str, key: str, label: str) -> ImageEmbedder:
         return DummyEmbedder(url)  # type: ignore[return-value]
 
     entries = [
         EmbedderRegistrationEntry(
             key="entry-a",
+            label="Entry A",
             family="entries",
             checkpoint_url="https://example.com/a.pth",
             factory=factory,
         ),
         EmbedderRegistrationEntry(
             key="entry-b",
+            label="Entry B",
             family="entries",
             checkpoint_url="https://example.com/b.pth",
             factory=factory,

@@ -17,15 +17,22 @@ from .helpers import resize_image_batch
 class SALADWrapper(torch.nn.Module):
     """Class representing a SALAD model."""
 
-    def __init__(self, impl: torch.nn.Module) -> None:
+    def __init__(self, impl: torch.nn.Module, key: str, label: str) -> None:
         """Initializer method."""
         super().__init__()
         self.impl = impl
+        self._key = key
+        self._label = label
 
     @property
-    def name(self) -> str:
-        """Returns the name of the embedder."""
-        return "salad"
+    def key(self) -> str:
+        """Returns the registry lookup key of the embedder."""
+        return self._key
+
+    @property
+    def label(self) -> str:
+        """Returns the presentation label of the embedder."""
+        return self._label
 
     @property
     def vector_size(self) -> int:
@@ -91,8 +98,8 @@ class SALADWrapper(torch.nn.Module):
         return self.impl.forward(images_resized)
 
 
-@register_embedder_factory(key="salad", family="salad")
-def load_salad() -> ImageEmbedder:
+@register_embedder_factory(key="salad", label="SALAD", family="salad")
+def load_salad(key: str, label: str) -> ImageEmbedder:
     """Loads a SALAD image embedder model."""
     impl: torch.nn.Module = torch.hub.load("serizba/salad", "dinov2_salad")
-    return SALADWrapper(impl=impl)
+    return SALADWrapper(impl=impl, key=key, label=label)
