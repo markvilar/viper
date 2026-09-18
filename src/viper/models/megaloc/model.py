@@ -5,6 +5,7 @@ MegaLoc composite model.
 from collections.abc import Mapping
 from typing import Any
 
+import torch
 import torch.nn as nn
 from torch import Tensor
 
@@ -48,8 +49,8 @@ class MegaLocModel(nn.Module):
         }
 
     @property
-    def device(self) -> str:
-        return str(next(self.parameters()).device)
+    def device(self) -> torch.device:
+        return next(self.parameters()).device
 
     def forward(self, images: Tensor) -> Tensor:
         if images.dim() != 4:

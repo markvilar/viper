@@ -51,9 +51,9 @@ class CosPlaceWrapper(torch.nn.Module):
         return {"backbone": self.backbone, "descriptor_size": self.descriptor_size}
 
     @property
-    def device(self) -> str:
+    def device(self) -> torch.device:
         """Returns the device of the embedder."""
-        return str(next(self.parameters()).device)
+        return next(self.parameters()).device
 
     def __call__(self, images: torch.Tensor) -> torch.Tensor:
         """
