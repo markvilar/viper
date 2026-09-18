@@ -14,15 +14,22 @@ DESCRIPTORS_DIMENSION: int = 2048
 class EigenPlacesWrapper(torch.nn.Module):
     """Class representing an EigenPlaces wrapper."""
 
-    def __init__(self, impl: torch.nn.Module) -> None:
+    def __init__(self, impl: torch.nn.Module, key: str, label: str) -> None:
         """Initializer method."""
         super().__init__()
         self.impl = impl
+        self._key = key
+        self._label = label
 
     @property
-    def name(self) -> str:
-        """Returns the name of the embedder."""
-        return "eigenplaces"
+    def key(self) -> str:
+        """Returns the registry lookup key of the embedder."""
+        return self._key
+
+    @property
+    def label(self) -> str:
+        """Returns the presentation label of the embedder."""
+        return self._label
 
     @property
     def vector_size(self) -> int:
@@ -37,7 +44,7 @@ class EigenPlacesWrapper(torch.nn.Module):
         }
 
     @property
-    def device(self) -> str:
+    def device(self) -> torch.device:
         """Returns the device of the embedder."""
         return next(self.parameters()).device
 
@@ -63,13 +70,13 @@ class EigenPlacesWrapper(torch.nn.Module):
         """
         assert images.dim() == 4, f"invalid batch dimensions: {images.dim()}"
         if images.shape[1] == 1:
-            images: torch.Tensor = convert_grayscale_batch_to_rgb(images)
+            images = convert_grayscale_batch_to_rgb(images)
         assert images.shape[1] == 3, f"invalid image batch channels: {images.shape[1]}"
         return self.impl.forward(images)
 
 
-@register_embedder_factory(key="eigenplaces", family="eigenplaces")
-def load_eigenplaces() -> ImageEmbedder:
+@register_embedder_factory(key="eigenplaces", label="EigenPlaces", family="eigenplaces")
+def load_eigenplaces(key: str, label: str) -> ImageEmbedder:
     """Loads an EigenPlaces model."""
     impl: torch.nn.Module = torch.hub.load(
         "gmberton/eigenplaces",
@@ -77,4 +84,4 @@ def load_eigenplaces() -> ImageEmbedder:
         backbone=BACKBONE,
         fc_output_dim=DESCRIPTORS_DIMENSION,
     )
-    return EigenPlacesWrapper(impl=impl)
+    return EigenPlacesWrapper(impl=impl, key=key, label=label)

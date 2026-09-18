@@ -26,35 +26,46 @@ CLIQUE_MINING_CHECKPOINT_URL: str = (
 class CliqueMiningWrapper(torch.nn.Module):
     """Class representing a wrapper for the CliqueMining model."""
 
-    def __init__(self, impl: torch.nn.Module) -> None:
+    def __init__(self, impl: torch.nn.Module, key: str, label: str) -> None:
         """Initializer method."""
         super().__init__()
         self.impl = impl
+        self._key = key
+        self._label = label
 
     @property
-    def name(self) -> str:
-        """Returns the name of the embedder."""
-        return "cliquemining"
+    def key(self) -> str:
+        """Returns the registry lookup key of the embedder."""
+        return self._key
+
+    @property
+    def label(self) -> str:
+        """Returns the presentation label of the embedder."""
+        return self._label
 
     @property
     def vector_size(self) -> int:
         """Returns the size, i.e. dimensions, of the image embeddings."""
-        global_token_size: int = self.impl.aggregator.token_features[-1].out_features
-        local_token_size: int = self.impl.aggregator.cluster_features[-1].out_channels
-        local_token_count: int = self.impl.aggregator.score[-1].out_channels
+        # NOTE: `impl` is a torch.hub-loaded third-party model with attributes
+        # (aggregator, backbone, ...) that are dynamic and not statically typed.
+        impl: typing.Any = self.impl
+        global_token_size: int = impl.aggregator.token_features[-1].out_features
+        local_token_size: int = impl.aggregator.cluster_features[-1].out_channels
+        local_token_count: int = impl.aggregator.score[-1].out_channels
         return local_token_size * local_token_count + global_token_size
 
     @property
     def embedder_parameters(self) -> dict[str, typing.Any]:
         """Returns the parameters of the embedder."""
+        impl: typing.Any = self.impl
         return {
             "backbone": "dinov2",
-            "backbone_channels": self.impl.backbone.num_channels,
+            "backbone_channels": impl.backbone.num_channels,
             "aggregator": "salad",
         }
 
     @property
-    def device(self) -> str:
+    def device(self) -> torch.device:
         """Returns the device of the embedder."""
         return next(self.parameters()).device
 
@@ -83,7 +94,7 @@ class CliqueMiningWrapper(torch.nn.Module):
 
         # If the image batch is grayscale, convert to 3 channels
         if images.shape[1] == 1:
-            images: torch.Tensor = convert_grayscale_batch_to_rgb(images)
+            images = convert_grayscale_batch_to_rgb(images)
 
         assert images.shape[1] == 3, f"invalid image batch channels: {images.shape[1]}"
 
@@ -94,8 +105,10 @@ class CliqueMiningWrapper(torch.nn.Module):
         return self.impl.forward(images_resized)
 
 
-@register_embedder_factory(key="cliquemining", family="cliquemining")
-def load_clique_mining() -> ImageEmbedder:
+@register_embedder_factory(
+    key="cliquemining", label="CliqueMining", family="cliquemining"
+)
+def load_clique_mining(key: str, label: str) -> ImageEmbedder:
     """
     Loads a CliqueMining wrapper by downloading SALAD from torch hub.
     """
@@ -117,7 +130,7 @@ def load_clique_mining() -> ImageEmbedder:
 
     assert "state_dict" in checkpoint, "missing checkpoint key: 'state_dict'"
 
-    state_dict: dict = checkpoint.get("state_dict")
+    state_dict: dict = checkpoint["state_dict"]
     impl.load_state_dict(state_dict)
 
-    return CliqueMiningWrapper(impl=impl)
+    return CliqueMiningWrapper(impl=impl, key=key, label=label)

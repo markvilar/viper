@@ -47,6 +47,7 @@ def test_truncate_linear_svd_full_rank_is_projection_equivalent() -> None:
 
     # Act
     new_weight, new_bias = truncate_linear_svd(weight, bias, k=5)
+    assert new_bias is not None
     original = x @ weight.T + bias
     truncated = x @ new_weight.T + new_bias
 

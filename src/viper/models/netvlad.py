@@ -43,6 +43,7 @@ class NetVLADLayer(nn.Module):
         )
         nn.init.xavier_uniform_(centers)
         self.register_parameter("centers", centers)
+        self.centers: nn.parameter.Parameter = centers
         self._intranorm: bool = intranorm
         self._num_cluters: int = num_clusters
         self._output_dim: int = input_dim * num_clusters
@@ -69,7 +70,7 @@ class NetVLADLayer(nn.Module):
         """
         batch_size: int = batch.size(0)
         scores: torch.Tensor = self.score_proj(batch)
-        scores: torch.Tensor = F.softmax(scores, dim=1)
+        scores = F.softmax(scores, dim=1)
 
         diff: torch.Tensor = batch.unsqueeze(2) - self.centers.unsqueeze(0).unsqueeze(
             -1
@@ -78,19 +79,22 @@ class NetVLADLayer(nn.Module):
 
         if self.intranorm:
             # From the official MATLAB implementation.
-            desc: torch.Tensor = F.normalize(desc, dim=1)
-        desc: torch.Tensor = desc.view(batch_size, -1)
-        desc: torch.Tensor = F.normalize(desc, dim=1)
+            desc = F.normalize(desc, dim=1)
+        desc = desc.view(batch_size, -1)
+        desc = F.normalize(desc, dim=1)
         return desc
 
 
 class NetVLAD(torch.nn.Module):
     """Class representing a NetVLAD torch module."""
 
-    def __init__(self, descriptors_dimension: int) -> None:
+    def __init__(self, descriptors_dimension: int, key: str, label: str) -> None:
         super().__init__()
 
         assert descriptors_dimension in [4096, 32768]
+
+        self._key = key
+        self._label = label
 
         # TODO: Create a factory function
         whiten: bool = descriptors_dimension == 4096
@@ -116,6 +120,7 @@ class NetVLAD(torch.nn.Module):
         self.backbone = nn.Sequential(*list(backbone.children())[:-2])
         self.netvlad_layer = NetVLADLayer()
 
+        self.whiten: nn.Linear | None
         if whiten:
             self.whiten = nn.Linear(self.netvlad_layer.output_dim, 4096)
         else:
@@ -169,9 +174,14 @@ class NetVLAD(torch.nn.Module):
         }
 
     @property
-    def name(self) -> str:
-        """Returns the name of the embedder."""
-        return "netvlad"
+    def key(self) -> str:
+        """Returns the registry lookup key of the embedder."""
+        return self._key
+
+    @property
+    def label(self) -> str:
+        """Returns the presentation label of the embedder."""
+        return self._label
 
     @property
     def vector_size(self) -> int:
@@ -190,7 +200,7 @@ class NetVLAD(torch.nn.Module):
         }
 
     @property
-    def device(self) -> str:
+    def device(self) -> torch.device:
         """Returns the device of the embedder."""
         return next(self.parameters()).device
 
@@ -203,11 +213,11 @@ class NetVLAD(torch.nn.Module):
         assert images.max() <= 1.0, "image values must be below 1.0"
         assert images.min() >= 0.0, "image values must be above 0.0"
 
-        images: torch.Tensor = denormalize_images(images)
+        images = denormalize_images(images)
 
         # If the image batch is grayscale, convert to 3 channels
         if images.shape[1] == 1:
-            images: torch.Tensor = convert_grayscale_batch_to_rgb(images)
+            images = convert_grayscale_batch_to_rgb(images)
 
         assert images.dim() == 4, f"invalid batch dimensions: {images.dim()}"
         assert images.shape[1] == 3, f"invalid image batch channels: {images.shape[1]}"
@@ -221,25 +231,23 @@ class NetVLAD(torch.nn.Module):
         mean = self.preprocess["mean"]
         std = self.preprocess["std"]
 
-        images: torch.Tensor = images - images.new_tensor(mean).view(1, -1, 1, 1)
-        images: torch.Tensor = images / images.new_tensor(std).view(1, -1, 1, 1)
+        images = images - images.new_tensor(mean).view(1, -1, 1, 1)
+        images = images / images.new_tensor(std).view(1, -1, 1, 1)
 
         # Feature extraction.
         descriptors: torch.Tensor = self.backbone(images)
         b, c, _, _ = descriptors.size()
-        descriptors: torch.Tensor = descriptors.view(b, c, -1)
+        descriptors = descriptors.view(b, c, -1)
 
         # NetVLAD layer.
-        descriptors: torch.Tensor = F.normalize(
-            descriptors, dim=1
-        )  # Pre-normalization.
-        descriptors: torch.Tensor = self.netvlad_layer(descriptors)
+        descriptors = F.normalize(descriptors, dim=1)  # Pre-normalization.
+        descriptors = self.netvlad_layer(descriptors)
 
         # Whiten if needed.
-        if hasattr(self, "whiten"):
+        if self.whiten is not None:
             # Whiten descriptors and perform final L2 normalization.
-            descriptors: torch.Tensor = self.whiten(descriptors)
-            descriptors: torch.Tensor = F.normalize(descriptors, dim=1)
+            descriptors = self.whiten(descriptors)
+            descriptors = F.normalize(descriptors, dim=1)
 
         return descriptors
 
@@ -260,17 +268,17 @@ def denormalize_images(
     :return: tensor of shape BxCxHxW
     """
     # 3, H, W, B
-    batch: torch.Tensor = batch.clone().permute(1, 2, 3, 0)
-    for t, m, s in zip(batch, mean, std):
+    permuted: torch.Tensor = batch.clone().permute(1, 2, 3, 0)
+    for t, m, s in zip(permuted, mean, std):
         t.mul_(s).add_(m)
     # B, 3, H, W
-    return torch.clamp(batch, 0, 1).permute(3, 0, 1, 2)
+    return torch.clamp(permuted, 0, 1).permute(3, 0, 1, 2)
 
 
-@register_embedder_factory(key="netvlad", family="netvlad")
-def load_netvlad() -> ImageEmbedder:
+@register_embedder_factory(key="netvlad", label="NetVLAD", family="netvlad")
+def load_netvlad(key: str, label: str) -> ImageEmbedder:
     """
     Creates a wrapper for a NetVLAD model.
     """
     # TODO: Move weight loading etc. from NetVLAD to this function!
-    return NetVLAD(descriptors_dimension=4096)
+    return NetVLAD(descriptors_dimension=4096, key=key, label=label)

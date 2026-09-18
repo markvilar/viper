@@ -10,8 +10,13 @@ class ImageEmbedder(typing.Protocol):
     """Class representing the interface for an image embedder."""
 
     @property
-    def name(self) -> str:
-        """Returns the name of the embedder."""
+    def key(self) -> str:
+        """Returns the registry lookup key of the embedder."""
+        ...
+
+    @property
+    def label(self) -> str:
+        """Returns the presentation label of the embedder."""
         ...
 
     @property

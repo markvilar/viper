@@ -15,33 +15,44 @@ class AnyLocWrapper(torch.nn.Module):
     Class representing a wrapper for the AnyLoc model.
     """
 
-    def __init__(self, impl: torch.nn.Module) -> None:
+    def __init__(self, impl: torch.nn.Module, key: str, label: str) -> None:
         """Initializer method."""
         super().__init__()
         self._impl = impl
+        self._key = key
+        self._label = label
         # NOTE: Add dummy parameter to infer device
         self._param = torch.nn.Parameter(torch.tensor(1.0))
 
     @property
-    def name(self) -> str:
-        """Returns the name of the embedder."""
-        return "anyloc"
+    def key(self) -> str:
+        """Returns the registry lookup key of the embedder."""
+        return self._key
+
+    @property
+    def label(self) -> str:
+        """Returns the presentation label of the embedder."""
+        return self._label
 
     @property
     def vector_size(self) -> int:
         """Returns the size, i.e. dimensions, of the image embeddings."""
-        return self._impl.vlad.num_clusters * self._impl.vlad.desc_dim
+        # NOTE: `_impl` is a torch.hub-loaded third-party model whose `vlad`
+        # attribute is dynamic and not statically typed.
+        impl: typing.Any = self._impl
+        return impl.vlad.num_clusters * impl.vlad.desc_dim
 
     @property
     def embedder_parameters(self) -> dict[str, typing.Any]:
         """Returns the parameters of the embedder."""
+        impl: typing.Any = self._impl
         return {
-            "num_clusters": self._impl.vlad.num_clusters,
-            "descriptor_dimensions": self._impl.vlad.desc_dim,
+            "num_clusters": impl.vlad.num_clusters,
+            "descriptor_dimensions": impl.vlad.desc_dim,
         }
 
     @property
-    def device(self) -> str:
+    def device(self) -> torch.device:
         """Returns the device of the embedder."""
         return next(self.parameters()).device
 
@@ -63,7 +74,7 @@ class AnyLocWrapper(torch.nn.Module):
         """
         # If the image batch is grayscale, convert to 3 channels
         if images.shape[1] == 1:
-            images: torch.Tensor = convert_grayscale_batch_to_rgb(images)
+            images = convert_grayscale_batch_to_rgb(images)
 
         assert images.dim() == 4, f"invalid batch dimensions: {images.dim()}"
         assert images.shape[1] == 3, f"invalid image batch channels: {images.shape[1]}"
@@ -74,8 +85,8 @@ class AnyLocWrapper(torch.nn.Module):
         return self._impl(images_resized)
 
 
-@register_embedder_factory(key="anyloc", family="anyloc")
-def load_anyloc() -> ImageEmbedder:
+@register_embedder_factory(key="anyloc", label="AnyLoc", family="anyloc")
+def load_anyloc(key: str, label: str) -> ImageEmbedder:
     """Loads an AnyLoc model."""
     # NOTE: AnyLoc requires CUDA to run, hence we assert
     if not torch.cuda.is_available():
@@ -88,5 +99,5 @@ def load_anyloc() -> ImageEmbedder:
         domain="unstructured",
         device="cuda",
     )
-    wrapper: AnyLocWrapper = AnyLocWrapper(impl=impl).eval()
+    wrapper: AnyLocWrapper = AnyLocWrapper(impl=impl, key=key, label=label).eval()
     return wrapper

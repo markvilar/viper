@@ -19,25 +19,27 @@ _FAMILY = "megaloc"
 _RELEASES = "https://github.com/markvilar/viper/releases/download"
 
 
-def _load_megaloc_from_url(url: str) -> ImageEmbedder:
+def _load_megaloc_from_url(url: str, key: str, label: str) -> ImageEmbedder:
     """Loads a MegaLoc variant from a state-dict checkpoint URL. Requires CUDA."""
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA is required for MegaLoc but is not available.")
     state_dict = torch.hub.load_state_dict_from_url(
         url, map_location="cpu", weights_only=True
     )
-    return build_megaloc_from_state_dict(state_dict).eval().cuda()
+    return build_megaloc_from_state_dict(state_dict, key=key, label=label).eval().cuda()
 
 
 _ENTRIES = [
     EmbedderRegistrationEntry(
         key="megaloc",
+        label="MegaLoc",
         family=_FAMILY,
         checkpoint_url=f"{_RELEASES}/megaloc-8448d-v1/megaloc-8448d-v1.pth",
         factory=_load_megaloc_from_url,
     ),
     EmbedderRegistrationEntry(
         key="megaloc-256d-svd-truncated",
+        label="MegaLoc 256D SVD-Truncated",
         family=_FAMILY,
         checkpoint_url=(
             f"{_RELEASES}/megaloc-svd-truncated-v1.0/megaloc-256d-svd-truncated-v1.pth"
@@ -46,6 +48,7 @@ _ENTRIES = [
     ),
     EmbedderRegistrationEntry(
         key="megaloc-512d-svd-truncated",
+        label="MegaLoc 512D SVD-Truncated",
         family=_FAMILY,
         checkpoint_url=(
             f"{_RELEASES}/megaloc-svd-truncated-v1.0/megaloc-512d-svd-truncated-v1.pth"
@@ -54,6 +57,7 @@ _ENTRIES = [
     ),
     EmbedderRegistrationEntry(
         key="megaloc-1024d-svd-truncated",
+        label="MegaLoc 1024D SVD-Truncated",
         family=_FAMILY,
         checkpoint_url=(
             f"{_RELEASES}/megaloc-svd-truncated-v1.0/megaloc-1024d-svd-truncated-v1.pth"

@@ -124,24 +124,31 @@ class MixVPRImpl(torch.nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forwards a batch of images through the model."""
-        x: torch.Tensor = transforms.Resize([320, 320], antialias=True)(x)
-        x: torch.Tensor = self.backbone(x)
-        x: torch.Tensor = self.aggregator(x)
+        x = transforms.Resize([320, 320], antialias=True)(x)
+        x = self.backbone(x)
+        x = self.aggregator(x)
         return x
 
 
 class MixVPRWrapper(torch.nn.Module):
     """Class representing a MixVPR wrapper."""
 
-    def __init__(self, impl: torch.nn.Module):
+    def __init__(self, impl: torch.nn.Module, key: str, label: str):
         """Initializer dunder method."""
         super().__init__()
         self.impl = impl
+        self._key = key
+        self._label = label
 
     @property
-    def name(self) -> str:
-        """Returns the name of the embedder."""
-        return "mixvpr"
+    def key(self) -> str:
+        """Returns the registry lookup key of the embedder."""
+        return self._key
+
+    @property
+    def label(self) -> str:
+        """Returns the presentation label of the embedder."""
+        return self._label
 
     @property
     def vector_size(self) -> int:
@@ -157,7 +164,7 @@ class MixVPRWrapper(torch.nn.Module):
         }
 
     @property
-    def device(self) -> str:
+    def device(self) -> torch.device:
         """Returns the device of the embedder."""
         return next(self.parameters()).device
 
@@ -183,7 +190,7 @@ class MixVPRWrapper(torch.nn.Module):
         """
         # If the image batch is grayscale, convert to 3 channels
         if images.shape[1] == 1:
-            images: torch.Tensor = convert_grayscale_batch_to_rgb(images)
+            images = convert_grayscale_batch_to_rgb(images)
 
         assert images.dim() == 4, f"invalid batch dimensions: {images.dim()}"
         assert images.shape[1] == 3, f"invalid image batch channels: {images.shape[1]}"
@@ -191,8 +198,8 @@ class MixVPRWrapper(torch.nn.Module):
         return self.impl.forward(images)
 
 
-@register_embedder_factory(key="mixvpr", family="mixvpr")
-def load_mixvpr() -> ImageEmbedder:
+@register_embedder_factory(key="mixvpr", label="MixVPR", family="mixvpr")
+def load_mixvpr(key: str, label: str) -> ImageEmbedder:
     """Loads a MixVPR model."""
     model_config: dict[str, int] = {
         "in_channels": 1024,
@@ -214,4 +221,4 @@ def load_mixvpr() -> ImageEmbedder:
     impl: torch.nn.Module = MixVPRImpl(agg_config=model_config)
     impl.load_state_dict(state_dict)
 
-    return MixVPRWrapper(impl=impl)
+    return MixVPRWrapper(impl=impl, key=key, label=label)

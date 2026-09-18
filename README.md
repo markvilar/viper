@@ -12,7 +12,7 @@ It also includes a lightweight registry mechanism that lets you register custom 
 
 ## Features
 
-- Common `ImageEmbedder` protocol for VPR models (name, vector size, device, call semantics).
+- Common `ImageEmbedder` protocol for VPR models (key, label, vector size, device, call semantics).
 - Eight wrapper models adapting popular VPR architectures to this interface:
     - AnyLoc
     - CliqueMining
@@ -48,18 +48,20 @@ import viper
 factory: viper.ImageEmbedderFactory = viper.get_embedder_factory("salad")    # or "mixvpr", "netvlad", "eigenplaces", ...
 embedder: viper.ImageEmbedder = factory()
 
-print(embedder.name)                   # "salad"
+print(embedder.key)                    # "salad"
+print(embedder.label)                  # "SALAD"
 print(embedder.vector_size)            # 8448
 print(embedder.embedder_parameters)    # dict of parameters
-print(embedder.device)                 # "cpu" or "cuda"
+print(embedder.device)                 # device("cpu") or device("cuda", 0)
 ```
 
 All embedders implement the `ImageEmbedder` protocol, which exposes:
 
-- `name: str`
+- `key: str` (registry lookup key)
+- `label: str` (presentation string)
 - `vector_size: int` (embedding dimension)
 - `embedder_parameters: dict[str, Any]` (model-specific metadata such as backbone, descriptor size, etc.)
-- `device: str` (e.g. `"cpu"` or `"cuda:0"`)
+- `device: torch.device`
 - `__call__(images: torch.Tensor) -> torch.Tensor` (batched embedding, `B x C x H x W -> B x E`)
 
 
@@ -90,9 +92,18 @@ from viper.registry import register_embedder_factory
 from viper.types import ImageEmbedder
 
 class MyEmbedder(torch.nn.Module):
+    def __init__(self, key: str, label: str) -> None:
+        super().__init__()
+        self._key = key
+        self._label = label
+
     @property
-    def name(self) -> str:
-        return "myembedder"
+    def key(self) -> str:
+        return self._key
+
+    @property
+    def label(self) -> str:
+        return self._label
 
     @property
     def vector_size(self) -> int:
@@ -103,17 +114,17 @@ class MyEmbedder(torch.nn.Module):
         return {"backbone": "resnet50"}
 
     @property
-    def device(self) -> str:
-        return next(self.parameters()).device.type
+    def device(self) -> torch.device:
+        return next(self.parameters()).device
 
     def forward(self, images: torch.Tensor) -> torch.Tensor:
         # return embeddings of shape B x 1024
         ...
 
 # Factory that returns an ImageEmbedder instance
-@register_embedder_factory(key="myembedder", family="myembedder")
-def load_myembedder() -> ImageEmbedder:
-    model = MyEmbedder()
+@register_embedder_factory(key="myembedder", label="MyEmbedder", family="myembedder")
+def load_myembedder(key: str, label: str) -> ImageEmbedder:
+    model = MyEmbedder(key=key, label=label)
     return model
 
 ```

@@ -39,8 +39,7 @@ def convert_grayscale_batch_to_rgb(images: torch.Tensor) -> torch.Tensor:
     """
     assert images.dim() == 4, f"invalid batch dimensions: {images.dim()}"
     assert images.shape[1] == 1, f"invalid batch channels: {images.shape[1]}"
-    images: torch.Tensor = images.repeat(1, 3, 1, 1)
-    return images
+    return images.repeat(1, 3, 1, 1)
 
 
 def calculate_image_size_dinov2(images: torch.Tensor) -> tuple[int, int]:
