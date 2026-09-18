@@ -88,10 +88,13 @@ class NetVLADLayer(nn.Module):
 class NetVLAD(torch.nn.Module):
     """Class representing a NetVLAD torch module."""
 
-    def __init__(self, descriptors_dimension: int) -> None:
+    def __init__(self, descriptors_dimension: int, key: str, label: str) -> None:
         super().__init__()
 
         assert descriptors_dimension in [4096, 32768]
+
+        self._key = key
+        self._label = label
 
         # TODO: Create a factory function
         whiten: bool = descriptors_dimension == 4096
@@ -171,9 +174,14 @@ class NetVLAD(torch.nn.Module):
         }
 
     @property
-    def name(self) -> str:
-        """Returns the name of the embedder."""
-        return "netvlad"
+    def key(self) -> str:
+        """Returns the registry lookup key of the embedder."""
+        return self._key
+
+    @property
+    def label(self) -> str:
+        """Returns the presentation label of the embedder."""
+        return self._label
 
     @property
     def vector_size(self) -> int:
@@ -267,10 +275,10 @@ def denormalize_images(
     return torch.clamp(permuted, 0, 1).permute(3, 0, 1, 2)
 
 
-@register_embedder_factory(key="netvlad", family="netvlad")
-def load_netvlad() -> ImageEmbedder:
+@register_embedder_factory(key="netvlad", label="NetVLAD", family="netvlad")
+def load_netvlad(key: str, label: str) -> ImageEmbedder:
     """
     Creates a wrapper for a NetVLAD model.
     """
     # TODO: Move weight loading etc. from NetVLAD to this function!
-    return NetVLAD(descriptors_dimension=4096)
+    return NetVLAD(descriptors_dimension=4096, key=key, label=label)

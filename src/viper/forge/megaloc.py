@@ -39,4 +39,9 @@ def forge_megaloc_svd_truncated(model: MegaLocModel, k: int) -> MegaLocModel:
         salad=model.aggregator.salad,
         linear=truncated_linear,
     )
-    return MegaLocModel(backbone=model.backbone, aggregator=aggregator)
+    return MegaLocModel(
+        backbone=model.backbone,
+        aggregator=aggregator,
+        key=model.key,
+        label=model.label,
+    )
