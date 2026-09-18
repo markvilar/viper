@@ -39,13 +39,13 @@ jobs:
       run: uv build
 
     - name: Linter code with ruff
-      run: uv run ruff check
+      run: uv run ruff check src tests
 
     - name: Check formatting with ruff
-      run: uv run ruff format --check
+      run: uv run ruff format --check src tests
 
     - name: Type check with mypy
-      run: uv run mypy .
+      run: uv run mypy src tests
 
     - name: Run tests
-      run: uv run pytest
+      run: uv run pytest tests
