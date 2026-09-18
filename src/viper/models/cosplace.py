@@ -17,13 +17,20 @@ class CosPlaceWrapper(torch.nn.Module):
     """
 
     def __init__(
-        self, impl: torch.nn.Module, backbone: str, descriptor_size: int
+        self,
+        impl: torch.nn.Module,
+        backbone: str,
+        descriptor_size: int,
+        key: str,
+        label: str,
     ) -> None:
         """Initializer method."""
         super().__init__()
         self.impl = impl
         self.backbone = backbone
         self.descriptor_size = descriptor_size
+        self._key = key
+        self._label = label
 
         impl_any: typing.Any = self.impl
         linear_aggregation_layers: list[torch.nn.Linear] = [
@@ -36,9 +43,14 @@ class CosPlaceWrapper(torch.nn.Module):
         )
 
     @property
-    def name(self) -> str:
-        """Returns the name of the embedder."""
-        return "cosplace"
+    def key(self) -> str:
+        """Returns the registry lookup key of the embedder."""
+        return self._key
+
+    @property
+    def label(self) -> str:
+        """Returns the presentation label of the embedder."""
+        return self._label
 
     @property
     def vector_size(self) -> int:
@@ -86,8 +98,8 @@ class CosPlaceWrapper(torch.nn.Module):
         return self.impl.forward(images)
 
 
-@register_embedder_factory(key="cosplace", family="cosplace")
-def load_cosplace() -> ImageEmbedder:
+@register_embedder_factory(key="cosplace", label="CosPlace", family="cosplace")
+def load_cosplace(key: str, label: str) -> ImageEmbedder:
     """
     Loads a CosPlace model from torch hub and adds it to a wrapper.
     """
@@ -103,4 +115,6 @@ def load_cosplace() -> ImageEmbedder:
         impl=impl,
         backbone=BACKBONE,
         descriptor_size=DESCRIPTORS_DIMENSION,
+        key=key,
+        label=label,
     )

@@ -15,17 +15,24 @@ class AnyLocWrapper(torch.nn.Module):
     Class representing a wrapper for the AnyLoc model.
     """
 
-    def __init__(self, impl: torch.nn.Module) -> None:
+    def __init__(self, impl: torch.nn.Module, key: str, label: str) -> None:
         """Initializer method."""
         super().__init__()
         self._impl = impl
+        self._key = key
+        self._label = label
         # NOTE: Add dummy parameter to infer device
         self._param = torch.nn.Parameter(torch.tensor(1.0))
 
     @property
-    def name(self) -> str:
-        """Returns the name of the embedder."""
-        return "anyloc"
+    def key(self) -> str:
+        """Returns the registry lookup key of the embedder."""
+        return self._key
+
+    @property
+    def label(self) -> str:
+        """Returns the presentation label of the embedder."""
+        return self._label
 
     @property
     def vector_size(self) -> int:
@@ -78,8 +85,8 @@ class AnyLocWrapper(torch.nn.Module):
         return self._impl(images_resized)
 
 
-@register_embedder_factory(key="anyloc", family="anyloc")
-def load_anyloc() -> ImageEmbedder:
+@register_embedder_factory(key="anyloc", label="AnyLoc", family="anyloc")
+def load_anyloc(key: str, label: str) -> ImageEmbedder:
     """Loads an AnyLoc model."""
     # NOTE: AnyLoc requires CUDA to run, hence we assert
     if not torch.cuda.is_available():
@@ -92,5 +99,5 @@ def load_anyloc() -> ImageEmbedder:
         domain="unstructured",
         device="cuda",
     )
-    wrapper: AnyLocWrapper = AnyLocWrapper(impl=impl).eval()
+    wrapper: AnyLocWrapper = AnyLocWrapper(impl=impl, key=key, label=label).eval()
     return wrapper
