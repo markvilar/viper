@@ -192,9 +192,9 @@ class NetVLAD(torch.nn.Module):
         }
 
     @property
-    def device(self) -> str:
+    def device(self) -> torch.device:
         """Returns the device of the embedder."""
-        return str(next(self.parameters()).device)
+        return next(self.parameters()).device
 
     def forward(self, images: torch.Tensor) -> torch.Tensor:
         """
