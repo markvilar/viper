@@ -34,6 +34,14 @@ class ImageEmbedder(typing.Protocol):
         """Returns the device of the embedder."""
         ...
 
+    def eval(self) -> "ImageEmbedder":
+        """Puts the embedder in evaluation mode and returns it."""
+        ...
+
+    def to(self, device: torch.device | str) -> "ImageEmbedder":
+        """Moves the embedder to the given device and returns it."""
+        ...
+
     def __call__(self, images: torch.Tensor) -> torch.Tensor:
         """
         Embeds a batch of images.
