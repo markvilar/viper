@@ -124,9 +124,9 @@ class MixVPRImpl(torch.nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forwards a batch of images through the model."""
-        x: torch.Tensor = transforms.Resize([320, 320], antialias=True)(x)
-        x: torch.Tensor = self.backbone(x)
-        x: torch.Tensor = self.aggregator(x)
+        x = transforms.Resize([320, 320], antialias=True)(x)
+        x = self.backbone(x)
+        x = self.aggregator(x)
         return x
 
 
@@ -159,7 +159,7 @@ class MixVPRWrapper(torch.nn.Module):
     @property
     def device(self) -> str:
         """Returns the device of the embedder."""
-        return next(self.parameters()).device
+        return str(next(self.parameters()).device)
 
     def __call__(self, images: torch.Tensor) -> torch.Tensor:
         """
@@ -183,7 +183,7 @@ class MixVPRWrapper(torch.nn.Module):
         """
         # If the image batch is grayscale, convert to 3 channels
         if images.shape[1] == 1:
-            images: torch.Tensor = convert_grayscale_batch_to_rgb(images)
+            images = convert_grayscale_batch_to_rgb(images)
 
         assert images.dim() == 4, f"invalid batch dimensions: {images.dim()}"
         assert images.shape[1] == 3, f"invalid image batch channels: {images.shape[1]}"

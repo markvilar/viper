@@ -39,7 +39,7 @@ class EigenPlacesWrapper(torch.nn.Module):
     @property
     def device(self) -> str:
         """Returns the device of the embedder."""
-        return next(self.parameters()).device
+        return str(next(self.parameters()).device)
 
     def __call__(self, images: torch.Tensor) -> torch.Tensor:
         """
@@ -63,7 +63,7 @@ class EigenPlacesWrapper(torch.nn.Module):
         """
         assert images.dim() == 4, f"invalid batch dimensions: {images.dim()}"
         if images.shape[1] == 1:
-            images: torch.Tensor = convert_grayscale_batch_to_rgb(images)
+            images = convert_grayscale_batch_to_rgb(images)
         assert images.shape[1] == 3, f"invalid image batch channels: {images.shape[1]}"
         return self.impl.forward(images)
 

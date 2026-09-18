@@ -30,24 +30,28 @@ class SALADWrapper(torch.nn.Module):
     @property
     def vector_size(self) -> int:
         """Returns the size, i.e. dimensions, of the image embeddings."""
-        global_token_size: int = self.impl.aggregator.token_features[-1].out_features
-        local_token_size: int = self.impl.aggregator.cluster_features[-1].out_channels
-        local_token_count: int = self.impl.aggregator.score[-1].out_channels
+        # NOTE: `impl` is a torch.hub-loaded third-party model with attributes
+        # (aggregator, backbone, ...) that are dynamic and not statically typed.
+        impl: typing.Any = self.impl
+        global_token_size: int = impl.aggregator.token_features[-1].out_features
+        local_token_size: int = impl.aggregator.cluster_features[-1].out_channels
+        local_token_count: int = impl.aggregator.score[-1].out_channels
         return local_token_size * local_token_count + global_token_size
 
     @property
     def embedder_parameters(self) -> dict[str, typing.Any]:
         """Returns the parameters of the embedder."""
+        impl: typing.Any = self.impl
         return {
             "backbone": "dinov2",
-            "backbone_channels": self.impl.backbone.num_channels,
+            "backbone_channels": impl.backbone.num_channels,
             "aggregator": "salad",
         }
 
     @property
     def device(self) -> str:
         """Returns the device of the embedder."""
-        return next(self.parameters()).device
+        return str(next(self.parameters()).device)
 
     def __call__(self, images: torch.Tensor) -> torch.Tensor:
         """
@@ -76,7 +80,7 @@ class SALADWrapper(torch.nn.Module):
 
         # If the image batch is grayscale, convert to 3 channels
         if images.shape[1] == 1:
-            images: torch.Tensor = convert_grayscale_batch_to_rgb(images)
+            images = convert_grayscale_batch_to_rgb(images)
 
         assert images.shape[1] == 3, f"invalid image batch channels: {images.shape[1]}"
 
