@@ -8,6 +8,7 @@ seams out the CUDA-bound load while exercising the full dispatch and IO path on
 CPU.
 """
 
+from collections.abc import Generator
 from pathlib import Path
 
 import pytest
@@ -29,16 +30,18 @@ _TEST_METHOD = "svd"
 
 
 @pytest.fixture
-def registered_dummy() -> None:
+def registered_dummy() -> Generator[None, None, None]:
     # Arrange a dummy factory + forge, cleaned up afterwards.
-    @register_embedder_factory(key=_TEST_MODEL_KEY, family=_TEST_MODEL_KEY)
+    # NOTE: these dummies only implement the subset of ImageEmbedder that the
+    # exercised CLI path touches, not the full protocol.
+    @register_embedder_factory(key=_TEST_MODEL_KEY, family=_TEST_MODEL_KEY)  # type: ignore[arg-type]
     def _load_dummy() -> nn.Module:
         return nn.Linear(8, 16)
 
-    @register_forge(
+    @register_forge(  # type: ignore[type-var]
         model_key=_TEST_MODEL_KEY, method=_TEST_METHOD, label="svd-truncated"
     )
-    def _forge_dummy(model: nn.Module, k: int) -> nn.Module:
+    def _forge_dummy(model: nn.Linear, k: int) -> nn.Module:
         return nn.Linear(model.in_features, k)
 
     yield

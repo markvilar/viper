@@ -16,11 +16,13 @@ from viper.models.megaloc import MegaLocAggregationModule, MegaLocModel
 
 
 def _build_megaloc(descriptor_dim: int, feature_dim: int = 16) -> MegaLocModel:
+    # Lightweight stand-ins: the forge only rewires these by reference and never
+    # calls forward on them, so their exact types don't matter for this test.
     backbone = nn.Identity()
     salad = nn.Identity()
     linear = nn.Linear(feature_dim, descriptor_dim)
-    aggregator = MegaLocAggregationModule(salad=salad, linear=linear)
-    return MegaLocModel(backbone=backbone, aggregator=aggregator)
+    aggregator = MegaLocAggregationModule(salad=salad, linear=linear)  # type: ignore[arg-type]
+    return MegaLocModel(backbone=backbone, aggregator=aggregator)  # type: ignore[arg-type]
 
 
 def test_forge_megaloc_svd_truncated_reduces_descriptor_dim() -> None:

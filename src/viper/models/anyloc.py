@@ -30,20 +30,24 @@ class AnyLocWrapper(torch.nn.Module):
     @property
     def vector_size(self) -> int:
         """Returns the size, i.e. dimensions, of the image embeddings."""
-        return self._impl.vlad.num_clusters * self._impl.vlad.desc_dim
+        # NOTE: `_impl` is a torch.hub-loaded third-party model whose `vlad`
+        # attribute is dynamic and not statically typed.
+        impl: typing.Any = self._impl
+        return impl.vlad.num_clusters * impl.vlad.desc_dim
 
     @property
     def embedder_parameters(self) -> dict[str, typing.Any]:
         """Returns the parameters of the embedder."""
+        impl: typing.Any = self._impl
         return {
-            "num_clusters": self._impl.vlad.num_clusters,
-            "descriptor_dimensions": self._impl.vlad.desc_dim,
+            "num_clusters": impl.vlad.num_clusters,
+            "descriptor_dimensions": impl.vlad.desc_dim,
         }
 
     @property
     def device(self) -> str:
         """Returns the device of the embedder."""
-        return next(self.parameters()).device
+        return str(next(self.parameters()).device)
 
     def __call__(self, images: torch.Tensor) -> torch.Tensor:
         """
@@ -63,7 +67,7 @@ class AnyLocWrapper(torch.nn.Module):
         """
         # If the image batch is grayscale, convert to 3 channels
         if images.shape[1] == 1:
-            images: torch.Tensor = convert_grayscale_batch_to_rgb(images)
+            images = convert_grayscale_batch_to_rgb(images)
 
         assert images.dim() == 4, f"invalid batch dimensions: {images.dim()}"
         assert images.shape[1] == 3, f"invalid image batch channels: {images.shape[1]}"

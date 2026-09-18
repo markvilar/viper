@@ -14,10 +14,13 @@ checkpoint file name (e.g. ``svd`` selects the method, but the file is named
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import TypeVar
 
 from viper.types import ImageEmbedder
 
 type ForgeFn = Callable[..., ImageEmbedder]
+
+_ForgeFnT = TypeVar("_ForgeFnT", bound=ForgeFn)
 
 
 @dataclass(frozen=True)
@@ -33,7 +36,7 @@ _forges: dict[tuple[str, str], ForgeEntry] = dict()
 
 def register_forge(
     model_key: str, method: str, label: str | None = None
-) -> Callable[[ForgeFn], ForgeFn]:
+) -> Callable[[_ForgeFnT], _ForgeFnT]:
     """
     Registers a forge for a ``(model_key, method)`` pair.
 
@@ -44,7 +47,7 @@ def register_forge(
                     ``method`` when omitted
     """
 
-    def decorator(func: ForgeFn) -> ForgeFn:
+    def decorator(func: _ForgeFnT) -> _ForgeFnT:
         _forges[(model_key, method)] = ForgeEntry(forge=func, label=label or method)
         return func
 

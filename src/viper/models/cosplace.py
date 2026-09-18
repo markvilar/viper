@@ -25,9 +25,10 @@ class CosPlaceWrapper(torch.nn.Module):
         self.backbone = backbone
         self.descriptor_size = descriptor_size
 
+        impl_any: typing.Any = self.impl
         linear_aggregation_layers: list[torch.nn.Linear] = [
             layer
-            for layer in self.impl.aggregation
+            for layer in impl_any.aggregation
             if isinstance(layer, torch.nn.Linear)
         ]
         assert linear_aggregation_layers[-1].out_features == self.descriptor_size, (
@@ -52,7 +53,7 @@ class CosPlaceWrapper(torch.nn.Module):
     @property
     def device(self) -> str:
         """Returns the device of the embedder."""
-        return next(self.parameters()).device
+        return str(next(self.parameters()).device)
 
     def __call__(self, images: torch.Tensor) -> torch.Tensor:
         """
@@ -80,7 +81,7 @@ class CosPlaceWrapper(torch.nn.Module):
         )
         # If the image batch is grayscale, convert to 3 channels
         if images.shape[1] == 1:
-            images: torch.Tensor = convert_grayscale_batch_to_rgb(images)
+            images = convert_grayscale_batch_to_rgb(images)
         assert images.shape[1] == 3, f"invalid image batch channels: {images.shape[1]}"
         return self.impl.forward(images)
 
