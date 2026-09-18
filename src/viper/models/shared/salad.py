@@ -34,7 +34,7 @@ def log_otp_solver(
 
 def get_matching_probs(
     S: Tensor,
-    dustbin_score: float = 1.0,
+    dustbin_score: float | Tensor = 1.0,
     num_iters: int = 3,
     reg: float = 1.0,
 ) -> Tensor:

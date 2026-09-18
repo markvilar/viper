@@ -52,4 +52,4 @@ class ImageEmbedder(typing.Protocol):
         ...
 
 
-type ImageEmbedderFactory = Callable[[...], ImageEmbedder]
+type ImageEmbedderFactory = Callable[..., ImageEmbedder]

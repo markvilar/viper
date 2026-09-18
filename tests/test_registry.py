@@ -54,7 +54,7 @@ def test_registered_factory_is_callable_and_returns_embedder() -> None:
     retrieved_factory: ImageEmbedderFactory = registry["callable_embedder"]
 
     # Act
-    embedder: ImageEmbedder = retrieved_factory()
+    embedder: Any = retrieved_factory()
     result: list[float] = embedder("dummy-image")
 
     # Assert
@@ -67,7 +67,7 @@ def test_registry_copy_is_isolated() -> None:
     registry: dict[str, ImageEmbedderFactory] = get_embedder_factory_registry()
 
     # Act
-    registry["new_key"] = lambda: None  # type: ignore[assignment]
+    registry["new_key"] = lambda: None  # type: ignore[return-value,assignment]
 
     # Assert
     # Modifying the returned dict must not affect the internal registry
@@ -130,5 +130,7 @@ def test_registers_entries_as_key_family_factories() -> None:
     assert factory_a is not None and factory_b is not None
 
     # Each wrapper binds its own entry's URL (no late-binding closure bug).
-    assert factory_a()("img") == "https://example.com/a.pth"
-    assert factory_b()("img") == "https://example.com/b.pth"
+    embedder_a: Any = factory_a()
+    embedder_b: Any = factory_b()
+    assert embedder_a("img") == "https://example.com/a.pth"
+    assert embedder_b("img") == "https://example.com/b.pth"

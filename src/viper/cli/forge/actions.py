@@ -10,7 +10,10 @@ Importing this module imports ``viper.forge``, which registers the built-in
 forges and, transitively, their embedder factories.
 """
 
+import typing
 from pathlib import Path
+
+import torch
 
 import viper.forge  # noqa: F401  (populates the forge and factory registries)
 from viper.forge.registry import ForgeEntry, get_forge
@@ -79,16 +82,17 @@ def adapt_model(
     Returns:
         the path the checkpoint was written to
     """
-    import torch
-
     entry = resolve_forge(model_key, method)
     model = load_source_model(model_key)
     forged = entry.forge(model, dim)
-    forged = forged.to("cpu")
+    # NOTE: ImageEmbedder doesn't declare `.to`/`.state_dict`, but every
+    # registered forge in practice returns a torch.nn.Module.
+    forged_module: torch.nn.Module = typing.cast(torch.nn.Module, forged)
+    forged_module = forged_module.to("cpu")
 
     if output is None:
         name = derive_checkpoint_name(model_key, dim, entry.label, revision)
         output = Path.cwd() / name
 
-    torch.save(forged.state_dict(), output)
+    torch.save(forged_module.state_dict(), output)
     return output
