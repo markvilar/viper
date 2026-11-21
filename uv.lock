@@ -1541,15 +1541,15 @@ wheels = [
 
 [[package]]
 name = "pytorch-metric-learning"
-version = "3.0.2"
+version = "3.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
     { name = "torch" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cf/96/84a70ae0b5c17afe41ab085ec0118cc215b97bb42d2babc6025b44944447/pytorch_metric_learning-3.0.2.tar.gz", hash = "sha256:295220283f71654d30cb5488ee27fbfb151941a705e7691150b68795d82ec7d9", size = 68549, upload-time = "2026-11-08T06:03:09.622Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e3/3d/100a7f6f7fc71783eca43d8ede7042d96681263d9494071815964ab4e907/pytorch_metric_learning-3.0.3.tar.gz", hash = "sha256:f0482dc376f954af2f83f85a48e3c735cac63e0a4de4a4a73bd63dea6810c9ae", size = 68824, upload-time = "2026-11-13T20:06:02.892Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/25/d9/e0b84d94dcfa727e7e76a625e1d76fd03f46bd96297f8259cfa79139c27d/pytorch_metric_learning-3.0.2-py3-none-any.whl", hash = "sha256:cbb822f73b45462fa6e111507d0be085378418af703f654df45af44239dcd7f7", size = 116376, upload-time = "2026-11-08T06:03:08.005Z" },
+    { url = "https://files.pythonhosted.org/packages/f7/db/919c49c27246b865929f4b67f4d29a6a7ffd4b43839d3cf47aa60ae2936c/pytorch_metric_learning-3.0.3-py3-none-any.whl", hash = "sha256:a93bd769f3ae90cb3cac52bdb012c17e3b88be78a022f7d07cdcc98fe27b1737", size = 116792, upload-time = "2026-11-13T20:06:01.564Z" },
 ]
 
 [[package]]
